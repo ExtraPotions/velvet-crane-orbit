@@ -6,9 +6,9 @@ Fork of [Amazon Dark Pattern Blocker](https://greasyfork.org/en/scripts/563061-a
 
 ## Install
 
-[Install from raw](https://raw.githubusercontent.com/ExtraPotions/amazon-dark-pattern-blocker/main/amazon-dark-pattern-blocker.user.js) (Violentmonkey will pick up `@updateURL`).
+[Install from raw](https://raw.githubusercontent.com/ExtraPotions/velvet-crane-orbit/main/amazon-dark-pattern-blocker.user.js) (Violentmonkey will pick up `@updateURL`).
 
-Current version: **0.1.19**
+Current version: **0.1.20**
 
 ## Settings
 

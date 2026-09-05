@@ -1,17 +1,17 @@
 // ==UserScript==
 // @name           Amazon Dark Pattern Blocker
-// @namespace      https://github.com/ExtraPotions/amazon-dark-pattern-blocker
-// @version        0.1.19
+// @namespace      https://github.com/ExtraPotions/velvet-crane-orbit
+// @version        0.1.20
 // @description    Remove Amazon dark patterns + floating favicon settings — fork of August4067 MIT; amazon.com only
 // @author         expDARE
 // @license        MIT
-// @homepageURL    https://github.com/ExtraPotions/amazon-dark-pattern-blocker
+// @homepageURL    https://github.com/ExtraPotions/velvet-crane-orbit
 // @match          https://www.amazon.com/*
 // @match          https://amazon.com/*
 // @icon           https://www.amazon.com/favicon.ico
 // @run-at         document-start
-// @downloadURL    https://raw.githubusercontent.com/ExtraPotions/amazon-dark-pattern-blocker/main/amazon-dark-pattern-blocker.user.js
-// @updateURL      https://raw.githubusercontent.com/ExtraPotions/amazon-dark-pattern-blocker/main/amazon-dark-pattern-blocker.user.js
+// @downloadURL    https://raw.githubusercontent.com/ExtraPotions/velvet-crane-orbit/main/amazon-dark-pattern-blocker.user.js
+// @updateURL      https://raw.githubusercontent.com/ExtraPotions/velvet-crane-orbit/main/amazon-dark-pattern-blocker.user.js
 // @grant          GM_getValue
 // @grant          GM_setValue
 // @grant          GM_registerMenuCommand
