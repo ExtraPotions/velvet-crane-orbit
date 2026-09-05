@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Amazon Dark Pattern Blocker
 // @namespace      https://github.com/ExtraPotions/velvet-crane-orbit
-// @version        0.1.21
+// @version        0.1.22
 // @description    Remove Amazon dark patterns + floating favicon settings — fork of August4067 MIT; amazon.com only
 // @author         expDARE
 // @license        MIT
@@ -838,8 +838,8 @@
   right: 12px !important;
   left: auto !important;
   z-index: 2147483000 !important;
-  width: 40px !important;
-  height: 40px !important;
+  width: 52px !important;
+  height: 52px !important;
   border-radius: 999px !important;
   border: 1px solid #ff9900 !important;
   background: #131921 !important;
@@ -863,8 +863,8 @@
   border-color: #ff9900 !important;
 }
 #${this.BTN_ID} img {
-  width: 22px !important;
-  height: 22px !important;
+  width: 28px !important;
+  height: 28px !important;
   object-fit: contain !important;
   pointer-events: none !important;
 }
@@ -984,12 +984,12 @@
       const img = document.createElement("img");
       img.src = this.ICON;
       img.alt = "";
-      img.width = 22;
-      img.height = 22;
+      img.width = 28;
+      img.height = 28;
       btn.appendChild(img);
 
       const clampTop = (y) => {
-        const max = Math.max(8, (window.innerHeight || 600) - 48);
+        const max = Math.max(8, (window.innerHeight || 600) - 60);
         return Math.min(max, Math.max(8, y));
       };
       const applyFabTop = (topPx) => {
@@ -1002,7 +1002,7 @@
         let saved = null;
         try { saved = GM_getValue("adpb-fabTop", null); } catch (e) {}
         if (typeof saved === "number" && isFinite(saved)) return clampTop(saved);
-        return clampTop((window.innerHeight || 600) - 56);
+        return clampTop((window.innerHeight || 600) - 68);
       };
       const placePanel = () => {
         const br = btn.getBoundingClientRect();
