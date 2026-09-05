@@ -8,9 +8,11 @@ Fork of [Amazon Dark Pattern Blocker](https://greasyfork.org/en/scripts/563061-a
 
 [Install from raw](https://raw.githubusercontent.com/ExtraPotions/velvet-crane-orbit/main/amazon-dark-pattern-blocker.user.js) (Violentmonkey will pick up `@updateURL`).
 
-Current version: **0.1.20**
+Current version: **0.1.21**
 
 ## Settings
+
+Drag the favicon button **up/down** on the right edge (position is saved).
 
 Floating bottom-right favicon button, or Violentmonkey/Tampermonkey script menu:
 

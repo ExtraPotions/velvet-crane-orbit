@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Amazon Dark Pattern Blocker
 // @namespace      https://github.com/ExtraPotions/velvet-crane-orbit
-// @version        0.1.20
+// @version        0.1.21
 // @description    Remove Amazon dark patterns + floating favicon settings — fork of August4067 MIT; amazon.com only
 // @author         expDARE
 // @license        MIT
@@ -820,7 +820,7 @@
 
 
   // ============================================
-  // SETTINGS RAIL (right-edge favicon button)
+  // SETTINGS FAB (floating favicon; vertical drag)
   // ============================================
 
   const SettingsRail = {
@@ -836,28 +836,31 @@
 #${this.BTN_ID} {
   position: fixed !important;
   right: 12px !important;
-  bottom: 16px !important;
+  left: auto !important;
   z-index: 2147483000 !important;
   width: 40px !important;
   height: 40px !important;
   border-radius: 999px !important;
   border: 1px solid #ff9900 !important;
   background: #131921 !important;
+  background-image: none !important;
   color: #ff9900 !important;
   box-shadow: 0 2px 10px rgba(0,0,0,.4), 0 0 0 1px rgba(255,153,0,0.25) !important;
-  cursor: pointer !important;
+  cursor: grab !important;
   padding: 0 !important;
   margin: 0 !important;
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
   overflow: hidden !important;
-  transition: transform .15s ease, background .15s ease, border-color .15s ease !important;
+  touch-action: none !important;
+  user-select: none !important;
+  transition: background .15s ease, border-color .15s ease !important;
 }
+#${this.BTN_ID}.adpb-dragging { cursor: grabbing !important; }
 #${this.BTN_ID}:hover {
   background: #232f3e !important;
   border-color: #ff9900 !important;
-  transform: scale(1.06) !important;
 }
 #${this.BTN_ID} img {
   width: 22px !important;
@@ -868,7 +871,8 @@
 #${this.PANEL_ID} {
   position: fixed !important;
   right: 12px !important;
-  bottom: 64px !important;
+  left: auto !important;
+  bottom: auto !important;
   top: auto !important;
   transform: none !important;
   z-index: 2147483001 !important;
@@ -958,7 +962,7 @@
 
       const foot = document.createElement("div");
       foot.className = "adpb-foot";
-      foot.textContent = "Saved in this browser · Violentmonkey menu still works";
+      foot.textContent = "Drag the button up/down · saved in this browser";
       panel.appendChild(foot);
       return panel;
     },
@@ -984,11 +988,75 @@
       img.height = 22;
       btn.appendChild(img);
 
+      const clampTop = (y) => {
+        const max = Math.max(8, (window.innerHeight || 600) - 48);
+        return Math.min(max, Math.max(8, y));
+      };
+      const applyFabTop = (topPx) => {
+        btn.style.setProperty("right", "12px", "important");
+        btn.style.setProperty("left", "auto", "important");
+        btn.style.setProperty("bottom", "auto", "important");
+        btn.style.setProperty("top", clampTop(topPx) + "px", "important");
+      };
+      const loadFabTop = () => {
+        let saved = null;
+        try { saved = GM_getValue("adpb-fabTop", null); } catch (e) {}
+        if (typeof saved === "number" && isFinite(saved)) return clampTop(saved);
+        return clampTop((window.innerHeight || 600) - 56);
+      };
+      const placePanel = () => {
+        const br = btn.getBoundingClientRect();
+        const ph = panel.offsetHeight || 300;
+        let top = br.top - ph - 8;
+        if (top < 8) top = br.bottom + 8;
+        const maxTop = Math.max(8, (window.innerHeight || 600) - Math.min(ph, (window.innerHeight || 600) - 16) - 8);
+        if (top > maxTop) top = maxTop;
+        panel.style.setProperty("right", "12px", "important");
+        panel.style.setProperty("left", "auto", "important");
+        panel.style.setProperty("bottom", "auto", "important");
+        panel.style.setProperty("top", top + "px", "important");
+      };
+      applyFabTop(loadFabTop());
+
+      const drag = { active: false, moved: false, startY: 0, origTop: 0, pointerId: null };
+      btn.addEventListener("pointerdown", (e) => {
+        if (e.button != null && e.button !== 0) return;
+        drag.active = true;
+        drag.moved = false;
+        drag.startY = e.clientY;
+        drag.origTop = btn.getBoundingClientRect().top;
+        drag.pointerId = e.pointerId;
+        try { btn.setPointerCapture(e.pointerId); } catch (err) {}
+      });
+      btn.addEventListener("pointermove", (e) => {
+        if (!drag.active) return;
+        const dy = e.clientY - drag.startY;
+        if (!drag.moved && Math.abs(dy) < 5) return;
+        drag.moved = true;
+        btn.classList.add("adpb-dragging");
+        applyFabTop(drag.origTop + dy);
+        if (panel.classList.contains("adpb-open")) placePanel();
+      });
+      const endDrag = () => {
+        if (!drag.active) return;
+        drag.active = false;
+        btn.classList.remove("adpb-dragging");
+        try { if (drag.pointerId != null) btn.releasePointerCapture(drag.pointerId); } catch (err2) {}
+        if (drag.moved) {
+          try { GM_setValue("adpb-fabTop", clampTop(btn.getBoundingClientRect().top)); } catch (e3) {}
+          if (panel.classList.contains("adpb-open")) placePanel();
+        }
+      };
+      btn.addEventListener("pointerup", endDrag);
+      btn.addEventListener("pointercancel", endDrag);
+
       btn.addEventListener("click", (e) => {
         e.preventDefault();
         e.stopPropagation();
+        if (drag.moved) { drag.moved = false; return; }
         const open = panel.classList.toggle("adpb-open");
         btn.setAttribute("aria-expanded", open ? "true" : "false");
+        if (open) placePanel();
       });
 
       document.addEventListener(
@@ -1002,6 +1070,11 @@
         },
         true,
       );
+
+      window.addEventListener("resize", () => {
+        applyFabTop(loadFabTop());
+        if (panel.classList.contains("adpb-open")) placePanel();
+      });
 
       document.body.appendChild(panel);
       document.body.appendChild(btn);
