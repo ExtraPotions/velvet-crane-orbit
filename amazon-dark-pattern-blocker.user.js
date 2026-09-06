@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Amazon Dark Pattern Blocker
 // @namespace      https://github.com/ExtraPotions/velvet-crane-orbit
-// @version        0.1.26
+// @version        0.1.27
 // @description    Remove Amazon dark patterns + floating favicon settings; amazon.com only
 // @author         expDARE
 // @license        CC-BY-NC-4.0
@@ -391,7 +391,7 @@
     const style = document.createElement("style");
     style.id = "adpb-styles";
     style.textContent =
-      "/* Amazon Dark Pattern Blocker 0.1.15 - FOUC prevention (cart-rail safe) */\n" +
+      "/* Amazon Dark Pattern Blocker 0.1.27 - FOUC prevention (cart-rail safe) */\n" +
       safeRules.join(",\n") +
       " {\n  display: none !important;\n}\n";
     (document.head || document.documentElement).appendChild(style);
@@ -547,7 +547,6 @@
     },
 
     processFbtCarousels() {
-      if (!Settings.removeFbtCarousels.value) return;
       const sels = [
         "#purchase-sims-feature",
         "#sims-consolidated-1_feature_div",
@@ -561,10 +560,16 @@
         ".a-carousel-container",
         "#browse_feature_div"
       ];
+      const hide = Settings.removeFbtCarousels.value;
       sels.forEach((sel) => {
         document.querySelectorAll(sel).forEach((el) => {
           if (el.closest("#imageBlock, #altImages, #imageBlockNew, #adpb-settings-fab, #adpb-settings-panel")) return;
-          el.style.setProperty("display", "none", "important");
+          if (hide) {
+            el.style.setProperty("display", "none", "important");
+          } else if (el.style.getPropertyValue("display") === "none") {
+            // Restore only what we hid; leave Amazon's own display alone
+            el.style.removeProperty("display");
+          }
         });
       });
     },
@@ -842,6 +847,30 @@
     }
   }
 
+  // Rebuild early CSS hide rules to match current Settings (live toggles).
+  // CSS-hidden nodes reappear when rules drop; nodes already el.remove()'d
+  // cannot be restored without navigation — that is expected.
+  function refreshHideStyles() {
+    const existing = document.getElementById("adpb-styles");
+    if (existing) existing.remove();
+    try {
+      injectStyles();
+    } catch (e) {
+      debug("refreshHideStyles failed", e);
+    }
+  }
+
+  function applySettingsLive() {
+    refreshHideStyles();
+    processPage();
+    try {
+      Declutterer.processFbtCarousels();
+      Declutterer.applyCompactSearch();
+    } catch (e) {
+      debug("applySettingsLive extras failed", e);
+    }
+  }
+
 
   // ============================================
   // SETTINGS FAB (floating favicon; vertical drag)
@@ -1018,8 +1047,7 @@
           setting.value = !!cb.checked;
           cb.setAttribute("aria-checked", cb.checked ? "true" : "false");
           try {
-            Declutterer.processFbtCarousels();
-            Declutterer.applyCompactSearch();
+            applySettingsLive();
           } catch (e) {}
         });
         panel.appendChild(lab);
@@ -1170,8 +1198,11 @@
         `${setting.value ? "\u2713" : "\u2717"} ${setting.displayName}`,
         () => {
           setting.toggle();
+          try {
+            applySettingsLive();
+          } catch (e) {}
           const state = setting.value ? "enabled" : "disabled";
-          alert(`${setting.displayName} ${state}. Refresh the page to apply.`);
+          alert(`${setting.displayName} ${state}.`);
         },
       );
     }
