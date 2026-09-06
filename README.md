@@ -2,31 +2,25 @@
 
 Violentmonkey / Tampermonkey userscript that strips common Amazon dark patterns on **amazon.com** / **www.amazon.com** only.
 
-Author: **expDARE** · License: **[CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/)** (attribution required).
+Author: **expDARE** · License: **[CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/)** (attribution required; **non-commercial**).
 
 ## Install
 
-[Install from raw](https://raw.githubusercontent.com/ExtraPotions/velvet-crane-orbit/main/amazon-dark-pattern-blocker.user.js) (Violentmonkey will pick up `@updateURL`).
+| Script | Version | Downloads | Install |
+| --- | --- | ---: | --- |
+| **Amazon Dark Pattern Blocker** | 0.1.25 | ![dl](https://img.shields.io/github/downloads/ExtraPotions/velvet-crane-orbit/amazon-dark-pattern-blocker.user.js/total?label=downloads) | [release](https://github.com/ExtraPotions/velvet-crane-orbit/releases/latest/download/amazon-dark-pattern-blocker.user.js) · [raw](https://raw.githubusercontent.com/ExtraPotions/velvet-crane-orbit/main/amazon-dark-pattern-blocker.user.js) |
 
-Current version: **0.1.25**
+**Total release downloads:** ![total](https://img.shields.io/github/downloads/ExtraPotions/velvet-crane-orbit/total?label=total%20downloads)
+
+> Badges count **GitHub Release asset** downloads. Prefer the **release** install link if you want your install counted. Violentmonkey updates from `raw.githubusercontent.com` are not counted.
 
 ## Settings
 
-Toggle switches (orange when on). Includes **Remove FBT / carousels** and **Compact search results**.
+Toggle switches (orange when on). Floating favicon button (drag up/down on the right).
 
-Floating bottom-right favicon button, or Violentmonkey/Tampermonkey script menu:
-
-- Prime upsells
-- Urgency messaging
-- Subscribe & Save prompts
-- Sponsored results
-- Credit card offers
-- Rufus
-- Music / service promos
-- FBT / carousels
+- Prime upsells, urgency, Subscribe & Save, sponsored, credit cards, Rufus, service promos
+- Remove FBT / carousels
 - Compact search results
-
-Drag the favicon button **up/down** on the right edge (position is saved).
 
 ## License
 
