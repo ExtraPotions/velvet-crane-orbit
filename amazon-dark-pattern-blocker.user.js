@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Amazon Dark Pattern Blocker
 // @namespace      https://github.com/ExtraPotions/velvet-crane-orbit
-// @version        0.1.28
+// @version        0.1.29
 // @description    Remove Amazon dark patterns + floating favicon settings; amazon.com only
 // @author         expDARE
 // @license        CC-BY-NC-4.0
@@ -402,7 +402,7 @@
     const style = document.createElement("style");
     style.id = "adpb-styles";
     style.textContent =
-      "/* Amazon Dark Pattern Blocker 0.1.28 - FOUC prevention (cart-rail safe) */\n" +
+      "/* Amazon Dark Pattern Blocker 0.1.29 - FOUC prevention (cart-rail safe) */\n" +
       safeRules.join(",\n") +
       " {\n  display: none !important;\n}\n";
     (document.head || document.documentElement).appendChild(style);
@@ -1073,7 +1073,7 @@
 
       const foot = document.createElement("div");
       foot.className = "adpb-foot";
-      foot.textContent = "Drag up/down · install from ExtraPotions/velvet-crane-orbit raw URL";
+      foot.textContent = "Drag up/down · install from GitHub Releases";
       panel.appendChild(foot);
       return panel;
     },
