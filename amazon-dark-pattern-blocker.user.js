@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Amazon Dark Pattern Blocker
 // @namespace      https://github.com/ExtraPotions/velvet-crane-orbit
-// @version        0.1.22
+// @version        0.1.23
 // @description    Remove Amazon dark patterns + floating favicon settings — fork of August4067 MIT; amazon.com only
 // @author         expDARE
 // @license        MIT
@@ -22,7 +22,7 @@
 
 /*
  * Fork of Amazon Dark Pattern Blocker by August4067
- * Original: https://greasyfork.org/en/scripts/563061-amazon-dark-pattern-blocker
+ * Original author: August4067 (MIT)
  *
  * MIT License
  * Copyright 2025, August4067
@@ -261,6 +261,14 @@
     autoClipCoupons: {
       displayName: "Auto-clip coupons",
       default: true,
+    },
+    removeFbtCarousels: {
+      displayName: "Remove FBT / carousels",
+      default: true,
+    },
+    compactSearchResults: {
+      displayName: "Compact search results",
+      default: false,
     },
   };
 
@@ -567,6 +575,49 @@
       this.removeByCategory("sponsoredProducts", "removeSponsoredProducts");
     },
 
+    processFbtCarousels() {
+      if (!Settings.removeFbtCarousels.value) return;
+      const sels = [
+        "#purchase-sims-feature",
+        "#sims-consolidated-1_feature_div",
+        "#sims-consolidated-2_feature_div",
+        "#similarities_feature_div",
+        "#sp_detail",
+        "#HLCXComparisonWidget_feature_div",
+        "#bundleV2_feature_div",
+        "[id*='anonCarousel']",
+        "#fbt_x_title",
+        ".a-carousel-container",
+        "#browse_feature_div"
+      ];
+      sels.forEach((sel) => {
+        document.querySelectorAll(sel).forEach((el) => {
+          if (el.closest("#imageBlock, #altImages, #imageBlockNew, #adpb-settings-fab, #adpb-settings-panel")) return;
+          el.style.setProperty("display", "none", "important");
+        });
+      });
+    },
+
+    applyCompactSearch() {
+      let node = document.getElementById("adpb-compact-search-style");
+      if (!Settings.compactSearchResults.value) {
+        if (node) node.remove();
+        return;
+      }
+      if (!node) {
+        node = document.createElement("style");
+        node.id = "adpb-compact-search-style";
+        (document.documentElement || document.head).appendChild(node);
+      }
+      node.textContent = `
+        .s-result-item, .s-card-container, [data-component-type="s-search-result"] {
+          margin-bottom: 0.35rem !important;
+        }
+        .s-result-item .a-section { padding-top: 0.25rem !important; padding-bottom: 0.25rem !important; }
+        .s-widget-container, .AdHolder { margin: 0.25rem 0 !important; }
+      `;
+    },
+
     processPrimeModals() {
       this.clickByCategory("primeModals");
     },
@@ -771,6 +822,8 @@
       Declutterer.processPrimeUpsells();
       Declutterer.processAIUpsells();
       Declutterer.processSponsoredProducts();
+      Declutterer.processFbtCarousels();
+      Declutterer.applyCompactSearch();
       Declutterer.processUrgencyTactics();
       Declutterer.processAutoClipCoupons();
       Declutterer.processTextReplacements();
@@ -907,11 +960,39 @@
   cursor: pointer !important;
   flex: 1 !important;
 }
-#${this.PANEL_ID} input[type="checkbox"] {
-  width: 16px !important;
-  height: 16px !important;
-  accent-color: #ff9900 !important;
+#${this.PANEL_ID} label.adpb-switch {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 10px !important;
+  width: 100% !important;
+  margin: 6px 0 !important;
+  color: #eee !important;
   cursor: pointer !important;
+  user-select: none !important;
+}
+#${this.PANEL_ID} .adpb-switch-text { flex: 1 1 auto !important; min-width: 0 !important; line-height: 1.3 !important; }
+#${this.PANEL_ID} .adpb-switch-input {
+  position: absolute !important; opacity: 0 !important; width: 0 !important; height: 0 !important; pointer-events: none !important;
+}
+#${this.PANEL_ID} .adpb-toggle {
+  position: relative !important; flex: none !important;
+  width: 36px !important; height: 18px !important;
+  background: #6b6b6b !important; border: 0 !important; border-radius: 12px !important;
+  cursor: pointer !important; box-sizing: border-box !important;
+  transition: background .15s ease !important;
+}
+#${this.PANEL_ID} .adpb-toggle::after {
+  content: "" !important; position: absolute !important; top: 0 !important; left: 0 !important;
+  width: 18px !important; height: 18px !important; border-radius: 12px !important;
+  background: #d4d4d4 !important; box-shadow: 0 1px 2px rgba(0,0,0,.35) !important;
+  transition: transform .15s ease, background .15s ease !important;
+}
+#${this.PANEL_ID} .adpb-switch-input:checked + .adpb-toggle {
+  background: #ff9900 !important;
+}
+#${this.PANEL_ID} .adpb-switch-input:checked + .adpb-toggle::after {
+  transform: translateX(18px) !important; background: #e8e8e8 !important;
 }
 #${this.PANEL_ID} .adpb-foot {
   margin-top: 8px !important;
@@ -944,25 +1025,38 @@
       panel.appendChild(title);
 
       Object.entries(Settings).forEach(([key, setting]) => {
-        const row = document.createElement("div");
-        row.className = "adpb-row";
+        const on = !!setting.value;
         const lab = document.createElement("label");
-        lab.textContent = setting.displayName;
+        lab.className = "adpb-switch";
+        const text = document.createElement("span");
+        text.className = "adpb-switch-text";
+        text.textContent = setting.displayName;
         const cb = document.createElement("input");
         cb.type = "checkbox";
-        cb.checked = !!setting.value;
+        cb.className = "adpb-switch-input";
+        cb.setAttribute("role", "switch");
+        cb.checked = on;
+        cb.setAttribute("aria-checked", on ? "true" : "false");
+        const track = document.createElement("span");
+        track.className = "adpb-toggle";
+        track.setAttribute("aria-hidden", "true");
+        lab.appendChild(text);
+        lab.appendChild(cb);
+        lab.appendChild(track);
         cb.addEventListener("change", () => {
           setting.value = !!cb.checked;
-          alert(setting.displayName + (cb.checked ? " enabled" : " disabled") + ". Refresh the page to apply.");
+          cb.setAttribute("aria-checked", cb.checked ? "true" : "false");
+          try {
+            Declutterer.processFbtCarousels();
+            Declutterer.applyCompactSearch();
+          } catch (e) {}
         });
-        row.appendChild(lab);
-        row.appendChild(cb);
-        panel.appendChild(row);
+        panel.appendChild(lab);
       });
 
       const foot = document.createElement("div");
       foot.className = "adpb-foot";
-      foot.textContent = "Drag the button up/down · saved in this browser";
+      foot.textContent = "Drag up/down · install from ExtraPotions/velvet-crane-orbit raw URL";
       panel.appendChild(foot);
       return panel;
     },

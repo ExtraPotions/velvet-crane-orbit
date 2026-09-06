@@ -2,15 +2,18 @@
 
 Violentmonkey / Tampermonkey userscript that strips common Amazon dark patterns on **amazon.com** / **www.amazon.com** only.
 
-Fork of [Amazon Dark Pattern Blocker](https://greasyfork.org/en/scripts/563061-amazon-dark-pattern-blocker) by **August4067** (MIT). Maintained by **expDARE**.
+Fork of Amazon Dark Pattern Blocker by **August4067** (MIT). Maintained by **expDARE**.
 
 ## Install
 
 [Install from raw](https://raw.githubusercontent.com/ExtraPotions/velvet-crane-orbit/main/amazon-dark-pattern-blocker.user.js) (Violentmonkey will pick up `@updateURL`).
 
-Current version: **0.1.22**
+Current version: **0.1.23**
 
 ## Settings
+
+FL-style switches (orange when on). Includes **Remove FBT / carousels** and **Compact search results**.
+
 
 Drag the favicon button **up/down** on the right edge (position is saved).
 
