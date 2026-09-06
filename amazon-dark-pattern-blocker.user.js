@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Amazon Dark Pattern Blocker
 // @namespace      https://github.com/ExtraPotions/velvet-crane-orbit
-// @version        0.1.27
+// @version        0.1.28
 // @description    Remove Amazon dark patterns + floating favicon settings; amazon.com only
 // @author         expDARE
 // @license        CC-BY-NC-4.0
@@ -81,7 +81,18 @@
       },
       sponsoredProducts: {
         setting: "removeSponsoredProducts",
-        // e.g., sponsoredResult: '[data-component-type="sp-sponsored-result"]',
+        // Search / browse sponsored slots
+        searchSponsoredResult: '[data-component-type="sp-sponsored-result"]',
+        searchAdHolder: ".AdHolder",
+        searchSponsoredLabelCard:
+          '.s-result-item:has(.puis-sponsored-label-text), .s-result-item:has(.s-sponsored-label-info-icon), .s-result-item:has([aria-label*="Sponsored"])',
+        searchSponsoredWidget:
+          '.s-widget-container:has(.puis-sponsored-label-text), .s-widget-container:has(.s-sponsored-label-text)',
+        // Product-page sponsored / ad shelves (distinct from FBT sims)
+        productSponsoredBrand: "#sp_detail_thematic",
+        productSponsoredBottom: "#sp_detail",
+        productAdsFeature: '[data-feature-name="sponsoredProducts"], [data-feature-name="sp_detail"]',
+        productAdFeedback: "#ad-feedback-text-desktop-auto-sparkle-extra",
       },
       creditCardUpsells: {
         setting: "removeCreditCardUpsells",
@@ -391,7 +402,7 @@
     const style = document.createElement("style");
     style.id = "adpb-styles";
     style.textContent =
-      "/* Amazon Dark Pattern Blocker 0.1.27 - FOUC prevention (cart-rail safe) */\n" +
+      "/* Amazon Dark Pattern Blocker 0.1.28 - FOUC prevention (cart-rail safe) */\n" +
       safeRules.join(",\n") +
       " {\n  display: none !important;\n}\n";
     (document.head || document.documentElement).appendChild(style);
@@ -457,6 +468,9 @@
       for (const [name, selector] of Object.entries(targets)) {
         const elements = document.querySelectorAll(selector);
         elements.forEach((el) => {
+          // Guard against MutationObserver + 2s poll re-clicking the same control
+          if (el.dataset.dpbClicked === "true") return;
+          el.dataset.dpbClicked = "true";
           el.click();
           count++;
           debug(`Clicked ${name}`);
@@ -763,6 +777,8 @@
       Declutterer.processUrgencyTactics();
       Declutterer.processSubscribeNudges();
       Declutterer.processSubscribeUnchecks();
+      Declutterer.processSponsoredProducts();
+      Declutterer.processFbtCarousels();
       Declutterer.processAutoClipCoupons();
       Declutterer.processTextReplacements();
       Declutterer.processPrimeModals();
@@ -830,6 +846,8 @@
       Declutterer.processCreditCardUpsells();
       Declutterer.processAmazonBusinessPromos();
       Declutterer.processUrgencyTactics();
+      Declutterer.processSponsoredProducts();
+      Declutterer.processFbtCarousels();
       Declutterer.processTextReplacements();
       Declutterer.processPrimeModals();
       Declutterer.processGeneralDismiss();
