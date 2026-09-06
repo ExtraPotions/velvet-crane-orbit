@@ -1,10 +1,10 @@
 // ==UserScript==
 // @name           Amazon Dark Pattern Blocker
 // @namespace      https://github.com/ExtraPotions/velvet-crane-orbit
-// @version        0.1.24
+// @version        0.1.25
 // @description    Remove Amazon dark patterns + floating favicon settings; amazon.com only
 // @author         expDARE
-// @license        CC-BY-4.0
+// @license        CC-BY-NC-4.0
 // @homepageURL    https://github.com/ExtraPotions/velvet-crane-orbit
 // @match          https://www.amazon.com/*
 // @match          https://amazon.com/*
@@ -23,8 +23,8 @@
 /*
  * Amazon Dark Pattern Blocker
  * Copyright (c) 2025–2026 expDARE
- * Licensed under CC BY 4.0 — https://creativecommons.org/licenses/by/4.0/
- * Forks and modifications must attribute expDARE.
+ * Licensed under CC BY-NC 4.0 — https://creativecommons.org/licenses/by-nc/4.0/
+ * Forks and modifications must attribute expDARE. Non-commercial use only — no profit from this work.
  */
 
 
