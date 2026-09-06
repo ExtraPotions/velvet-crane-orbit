@@ -1,14 +1,36 @@
 // ==UserScript==
 // @name           Amazon Dark Pattern Blocker
 // @namespace      https://github.com/ExtraPotions/velvet-crane-orbit
-// @version        0.1.30
-// @description    Remove Amazon dark patterns + floating favicon settings; amazon.com only
+// @version        0.1.31
+// @description    Remove Amazon dark patterns + floating settings; major amazon.* storefronts
 // @author         expDARE
 // @license        CC-BY-NC-4.0
 // @homepageURL    https://github.com/ExtraPotions/velvet-crane-orbit
 // @match          https://www.amazon.com/*
 // @match          https://amazon.com/*
-// @icon           https://www.amazon.com/favicon.ico
+// @match          https://www.amazon.co.uk/*
+// @match          https://amazon.co.uk/*
+// @match          https://www.amazon.ca/*
+// @match          https://amazon.ca/*
+// @match          https://www.amazon.de/*
+// @match          https://amazon.de/*
+// @match          https://www.amazon.fr/*
+// @match          https://amazon.fr/*
+// @match          https://www.amazon.it/*
+// @match          https://amazon.it/*
+// @match          https://www.amazon.es/*
+// @match          https://amazon.es/*
+// @match          https://www.amazon.co.jp/*
+// @match          https://amazon.co.jp/*
+// @match          https://www.amazon.com.au/*
+// @match          https://amazon.com.au/*
+// @match          https://www.amazon.in/*
+// @match          https://amazon.in/*
+// @match          https://www.amazon.com.mx/*
+// @match          https://amazon.com.mx/*
+// @match          https://www.amazon.nl/*
+// @match          https://amazon.nl/*
+// @icon           https://raw.githubusercontent.com/ExtraPotions/velvet-crane-orbit/main/icon-128.png
 // @run-at         document-start
 // @downloadURL    https://github.com/ExtraPotions/velvet-crane-orbit/releases/latest/download/amazon-dark-pattern-blocker.user.js
 // @updateURL      https://github.com/ExtraPotions/velvet-crane-orbit/releases/latest/download/amazon-dark-pattern-blocker.user.js
@@ -402,7 +424,7 @@
     const style = document.createElement("style");
     style.id = "adpb-styles";
     style.textContent =
-      "/* Amazon Dark Pattern Blocker 0.1.30 - FOUC prevention (cart-rail safe) */\n" +
+      "/* Amazon Dark Pattern Blocker 0.1.31 - FOUC prevention (cart-rail safe) */\n" +
       safeRules.join(",\n") +
       " {\n  display: none !important;\n}\n";
     (document.head || document.documentElement).appendChild(style);
@@ -899,7 +921,7 @@
     BTN_ID: "adpb-settings-fab",
     PANEL_ID: "adpb-settings-panel",
     STYLE_ID: "adpb-settings-rail-style",
-    ICON: "https://www.amazon.com/favicon.ico",
+    ICON: "https://raw.githubusercontent.com/ExtraPotions/velvet-crane-orbit/main/icon-64.png",
 
     css() {
       return `
