@@ -1,10 +1,10 @@
 // ==UserScript==
 // @name           Amazon Dark Pattern Blocker
 // @namespace      https://github.com/ExtraPotions/velvet-crane-orbit
-// @version        0.1.23
-// @description    Remove Amazon dark patterns + floating favicon settings — fork of August4067 MIT; amazon.com only
+// @version        0.1.24
+// @description    Remove Amazon dark patterns + floating favicon settings; amazon.com only
 // @author         expDARE
-// @license        MIT
+// @license        CC-BY-4.0
 // @homepageURL    https://github.com/ExtraPotions/velvet-crane-orbit
 // @match          https://www.amazon.com/*
 // @match          https://amazon.com/*
@@ -21,41 +21,12 @@
 /* eslint-env es2017 */
 
 /*
- * Fork of Amazon Dark Pattern Blocker by August4067
- * Original author: August4067 (MIT)
- *
- * MIT License
- * Copyright 2025, August4067
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- *
- * Maintained fork by expDARE — ExtraPotions/super-octo-parakeet
- * Match scope narrowed to amazon.com / www.amazon.com only.
- * 0.1.16: right-edge vertical favicon settings rail (mirrors Grey Edition).
- * 0.1.17: rail/button themed to Amazon navy + orange accent (site color scheme).
- * 0.1.18: floating circular favicon button (no full-height rail).
- * 0.1.11: stop removing #desktop-banner / gwm homepage layout (was wiping the homepage).
- * 0.1.12: stop removing #attach-desktop-sideSheet (right-side cart flyout).
- * 0.1.13: protect cart rails (ewc/sw/sc-buy-box); drop broad protection + #sw-maple hides.
- * 0.1.14: remove display:revert force-show (broke ewc/cart); expand cart guards; leave #sc-primeupsell-widget alone.
- * 0.1.15: homepage only strips Join Prime + Rufus; CSS hides exclude #nav-flyout-ewc descendants (fixes blank cart rail).
+ * Amazon Dark Pattern Blocker
+ * Copyright (c) 2025–2026 expDARE
+ * Licensed under CC BY 4.0 — https://creativecommons.org/licenses/by/4.0/
+ * Forks and modifications must attribute expDARE.
  */
+
 
 (function () {
   "use strict";
