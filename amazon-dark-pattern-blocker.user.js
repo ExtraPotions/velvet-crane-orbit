@@ -49,7 +49,7 @@
  * Match scope narrowed to amazon.com / www.amazon.com only.
  * 0.1.16: right-edge vertical favicon settings rail (mirrors Grey Edition).
  * 0.1.17: rail/button themed to Amazon navy + orange accent (site color scheme).
- * 0.1.18: floating circular favicon button (no full-height rail) — matches FL dock show.
+ * 0.1.18: floating circular favicon button (no full-height rail).
  * 0.1.11: stop removing #desktop-banner / gwm homepage layout (was wiping the homepage).
  * 0.1.12: stop removing #attach-desktop-sideSheet (right-side cart flyout).
  * 0.1.13: protect cart rails (ewc/sw/sc-buy-box); drop broad protection + #sw-maple hides.

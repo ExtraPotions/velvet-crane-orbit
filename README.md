@@ -12,7 +12,7 @@ Current version: **0.1.23**
 
 ## Settings
 
-FL-style switches (orange when on). Includes **Remove FBT / carousels** and **Compact search results**.
+Toggle switches (orange when on). Includes **Remove FBT / carousels** and **Compact search results**.
 
 
 Drag the favicon button **up/down** on the right edge (position is saved).
