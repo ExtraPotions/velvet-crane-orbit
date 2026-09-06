@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Amazon Dark Pattern Blocker
 // @namespace      https://github.com/ExtraPotions/velvet-crane-orbit
-// @version        0.1.29
+// @version        0.1.30
 // @description    Remove Amazon dark patterns + floating favicon settings; amazon.com only
 // @author         expDARE
 // @license        CC-BY-NC-4.0
@@ -402,7 +402,7 @@
     const style = document.createElement("style");
     style.id = "adpb-styles";
     style.textContent =
-      "/* Amazon Dark Pattern Blocker 0.1.29 - FOUC prevention (cart-rail safe) */\n" +
+      "/* Amazon Dark Pattern Blocker 0.1.30 - FOUC prevention (cart-rail safe) */\n" +
       safeRules.join(",\n") +
       " {\n  display: none !important;\n}\n";
     (document.head || document.documentElement).appendChild(style);
@@ -909,8 +909,8 @@
   right: 12px !important;
   left: auto !important;
   z-index: 2147483000 !important;
-  width: 52px !important;
-  height: 52px !important;
+  width: 48px !important;
+  height: 48px !important;
   border-radius: 999px !important;
   border: 1px solid #ff9900 !important;
   background: #131921 !important;
@@ -934,8 +934,8 @@
   border-color: #ff9900 !important;
 }
 #${this.BTN_ID} img {
-  width: 28px !important;
-  height: 28px !important;
+  width: 26px !important;
+  height: 26px !important;
   object-fit: contain !important;
   pointer-events: none !important;
 }
@@ -1095,12 +1095,12 @@
       const img = document.createElement("img");
       img.src = this.ICON;
       img.alt = "";
-      img.width = 28;
-      img.height = 28;
+      img.width = 26;
+      img.height = 26;
       btn.appendChild(img);
 
       const clampTop = (y) => {
-        const max = Math.max(8, (window.innerHeight || 600) - 60);
+        const max = Math.max(8, (window.innerHeight || 600) - 56);
         return Math.min(max, Math.max(8, y));
       };
       const applyFabTop = (topPx) => {
@@ -1113,7 +1113,7 @@
         let saved = null;
         try { saved = GM_getValue("adpb-fabTop", null); } catch (e) {}
         if (typeof saved === "number" && isFinite(saved)) return clampTop(saved);
-        return clampTop((window.innerHeight || 600) - 68);
+        return clampTop((window.innerHeight || 600) - 64);
       };
       const placePanel = () => {
         const br = btn.getBoundingClientRect();
