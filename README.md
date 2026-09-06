@@ -17,7 +17,7 @@
   <a href="https://creativecommons.org/licenses/by-nc/4.0/"><img alt="License: CC BY-NC 4.0" src="https://img.shields.io/badge/license-CC%20BY--NC%204.0-lightgrey?style=flat-square" /></a>
 </p>
 
-**Author:** [expDARE](https://github.com/ExtraPotions) · **Latest:** [v0.1.31](https://github.com/ExtraPotions/velvet-crane-orbit/releases/tag/v0.1.31)
+**Author:** [expDARE](https://github.com/ExtraPotions) · **Latest:** [v0.1.32](https://github.com/ExtraPotions/velvet-crane-orbit/releases/tag/v0.1.32)
 
 | Stat | Value |
 |------|-------|
@@ -41,7 +41,7 @@
 - Urgency / scarcity tactics  
 - Subscribe & Save nudges  
 - Sponsored products and ad shelves  
-- Credit card and protection-plan upsells  
+- Credit-card, installment, and protection-plan upsells  
 - Rufus / AI promo chrome  
 - Amazon service and Business promos  
 - Frequently bought together / carousel clutter  
@@ -50,7 +50,9 @@ Optional: auto-clip coupons, compact search results.
 
 ## Settings
 
-Floating icon button on the right (drag up/down). Orange switches = on. Most changes apply live without a refresh.
+Floating icon button on the right (drag up/down). The panel groups the 13 protections into Promotions, Advertising, Amazon services, AI, Convenience, and Advanced; each switch includes a short description. Use the **Protection** master switch to pause or resume all cleanup, or **Reset recommended** to restore defaults.
+
+Most changes apply live without a refresh. The panel also shows per-session blocked-item totals by category and lets you clear those stats.
 
 ## License
 
