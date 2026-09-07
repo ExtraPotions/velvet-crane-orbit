@@ -3725,6 +3725,104 @@
         );
       };
 
+      const pushRelatedControls = () => {
+        const buttonRect =
+          button.getBoundingClientRect();
+        const viewportHeight =
+          window.innerHeight || 600;
+        const buttonCenter =
+          buttonRect.top +
+          buttonRect.height / 2;
+
+        document
+          .querySelectorAll(
+            'button, [role="button"], input[type="button"], input[type="submit"], a[role="button"]',
+          )
+          .forEach((node) => {
+            if (
+              node === button ||
+              node === identityLabel ||
+              node.closest(
+                "#adpb-settings-fab, #adpb-settings-panel, #adpb-settings-label",
+              )
+            ) {
+              return;
+            }
+
+            const style =
+              window.getComputedStyle(node);
+            const zIndex =
+              parseInt(style.zIndex, 10) || 0;
+
+            // Only move controls that opt into the ExtraPotions protocol or
+            // are clearly userscript overlays (very high stacking context).
+            const related =
+              node.dataset.expdareOwner ===
+                "expDARE" ||
+              node.dataset.expdareControl ===
+                "true" ||
+              zIndex >= 100000;
+
+            if (
+              !related ||
+              (style.position !== "fixed" &&
+                style.position !== "sticky")
+            ) {
+              return;
+            }
+
+            const rect =
+              node.getBoundingClientRect();
+
+            const overlaps =
+              rect.right >=
+                buttonRect.left - 8 &&
+              rect.left <=
+                buttonRect.right + 8 &&
+              rect.bottom >
+                buttonRect.top - 8 &&
+              rect.top <
+                buttonRect.bottom + 8;
+
+            if (!overlaps) {
+              if (
+                node.dataset.adpbPushed ===
+                "true"
+              ) {
+                node.style.removeProperty(
+                  "translate",
+                );
+                delete node.dataset.adpbPushed;
+              }
+              return;
+            }
+
+            const awayFromTop =
+              buttonCenter <
+              viewportHeight / 2;
+            const distance =
+              awayFromTop
+                ? buttonRect.bottom -
+                  rect.top +
+                  10
+                : rect.bottom -
+                  buttonRect.top +
+                  10;
+            const delta =
+              awayFromTop
+                ? Math.max(10, distance)
+                : -Math.max(10, distance);
+
+            node.style.setProperty(
+              "translate",
+              `0px ${delta}px`,
+              "important",
+            );
+            node.dataset.adpbPushed =
+              "true";
+          });
+      };
+
       const controlIdentity = (node) => ({
         id: node.id || "",
         ariaLabel:
@@ -3806,7 +3904,7 @@
 
       const applyFabTop = (
         topPx,
-        avoidButtons = true,
+        avoidButtons = false,
       ) => {
         button.style.setProperty(
           "right",
@@ -3834,6 +3932,7 @@
           "important",
         );
 
+        pushRelatedControls();
         positionLabel();
       };
 
