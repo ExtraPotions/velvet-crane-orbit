@@ -1885,7 +1885,7 @@
     0 18px 50px rgba(0,0,0,.48),
     0 3px 12px rgba(0,0,0,.28) !important;
 
-  padding: 16px !important;
+  padding: 18px !important;
 
   font:
     13px/1.4
@@ -1896,6 +1896,7 @@
   display: none !important;
 
   scrollbar-width: thin !important;
+  text-align: left !important;
 }
 
 #${this.PANEL_ID}.adpb-open {
@@ -2019,10 +2020,12 @@
 
   gap: 12px !important;
 
-  padding: 11px 0 13px !important;
-  margin-bottom: 3px !important;
+  padding: 13px !important;
+  margin-bottom: 14px !important;
 
-  border-bottom: 1px solid rgba(255,255,255,.08) !important;
+  border: 1px solid rgba(255,153,0,.22) !important;
+  border-radius: 11px !important;
+  background: rgba(255,153,0,.08) !important;
 }
 
 #${this.PANEL_ID} .adpb-master-copy {
@@ -2030,6 +2033,7 @@
 }
 
 #${this.PANEL_ID} .adpb-master-title {
+  font-size: 14px !important;
   font-weight: 700 !important;
   color: #fff !important;
 }
@@ -2041,20 +2045,67 @@
 }
 
 #${this.PANEL_ID} .adpb-section {
-  margin-top: 15px !important;
+  margin-top: 10px !important;
+
+  border: 1px solid rgba(255,255,255,.08) !important;
+  border-radius: 10px !important;
+  background: rgba(255,255,255,.025) !important;
+  overflow: hidden !important;
+}
+
+#${this.PANEL_ID} .adpb-section-toggle {
+  display: flex !important;
+  align-items: center !important;
+  width: 100% !important;
+  min-height: 42px !important;
+  padding: 0 13px !important;
+  border: 0 !important;
+  background: transparent !important;
+  color: #f2f3f5 !important;
+  cursor: pointer !important;
+  font: inherit !important;
+  text-align: left !important;
+}
+
+#${this.PANEL_ID} .adpb-section-toggle:hover {
+  background: rgba(255,255,255,.045) !important;
+}
+
+#${this.PANEL_ID} .adpb-section-toggle:focus-visible,
+#${this.PANEL_ID} .adpb-action:focus-visible {
+  outline: 2px solid rgba(255,153,0,.75) !important;
+  outline-offset: -2px !important;
 }
 
 #${this.PANEL_ID} .adpb-section-title {
-  margin: 0 0 7px !important;
+  flex: 1 1 auto !important;
+  font-size: 12px !important;
+  font-weight: 650 !important;
+}
 
-  font-size: 10px !important;
-  line-height: 1 !important;
+#${this.PANEL_ID} .adpb-section-count {
+  margin-right: 10px !important;
+  color: #828994 !important;
+  font-size: 11px !important;
+}
 
-  font-weight: 700 !important;
-  letter-spacing: .08em !important;
-  text-transform: uppercase !important;
+#${this.PANEL_ID} .adpb-section-chevron {
+  color: #9ca3af !important;
+  font-size: 16px !important;
+  transition: transform .15s ease !important;
+}
 
-  color: #8e96a0 !important;
+#${this.PANEL_ID} .adpb-section.is-open .adpb-section-chevron {
+  transform: rotate(90deg) !important;
+}
+
+#${this.PANEL_ID} .adpb-section-content {
+  display: none !important;
+  padding: 0 13px 7px !important;
+}
+
+#${this.PANEL_ID} .adpb-section.is-open .adpb-section-content {
+  display: block !important;
 }
 
 #${this.PANEL_ID} .adpb-setting {
@@ -2068,6 +2119,14 @@
   padding: 9px 0 !important;
 
   cursor: pointer !important;
+}
+
+#${this.PANEL_ID} .adpb-setting.is-extra {
+  display: none !important;
+}
+
+#${this.PANEL_ID} .adpb-section.show-all .adpb-setting.is-extra {
+  display: flex !important;
 }
 
 #${this.PANEL_ID} .adpb-setting-copy {
@@ -2162,6 +2221,46 @@
     0 0 0 2px rgba(255,153,0,.35) !important;
 }
 
+#${this.PANEL_ID} .adpb-master .adpb-toggle {
+  width: 46px !important;
+  height: 25px !important;
+  background: #565d66 !important;
+}
+
+#${this.PANEL_ID} .adpb-master .adpb-toggle::after {
+  width: 21px !important;
+  height: 21px !important;
+}
+
+#${this.PANEL_ID} .adpb-master .adpb-switch-input:checked + .adpb-toggle::after {
+  transform: translateX(21px) !important;
+}
+
+#${this.PANEL_ID} .adpb-show-more {
+  width: 100% !important;
+  min-height: 34px !important;
+  margin: 2px 0 3px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  color: #ffb347 !important;
+  cursor: pointer !important;
+  font: inherit !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  text-align: left !important;
+}
+
+#${this.PANEL_ID} .adpb-show-more:hover,
+#${this.PANEL_ID} .adpb-show-more:focus-visible {
+  color: #ffd08a !important;
+}
+
+#${this.PANEL_ID} .adpb-show-more:focus-visible {
+  outline: 2px solid rgba(255,153,0,.75) !important;
+  outline-offset: 2px !important;
+}
+
 #${this.PANEL_ID} .adpb-stats {
   margin-top: 15px !important;
 
@@ -2228,6 +2327,8 @@
 
   font: inherit !important;
   font-size: 11px !important;
+  padding: 0 10px !important;
+  text-align: left !important;
 }
 
 #${this.PANEL_ID} .adpb-action:hover {
@@ -2246,7 +2347,7 @@
   font-size: 10px !important;
   line-height: 1.4 !important;
 
-  text-align: center !important;
+  text-align: left !important;
 }
 `;
     },
@@ -2579,28 +2680,115 @@
         section.className =
           "adpb-section";
 
-        const heading =
-          document.createElement("div");
+        if (category === SETTING_CATEGORIES[0]) {
+          section.classList.add("is-open");
+        }
 
+        const categorySettings =
+          Object.entries(Settings).filter(
+            ([, setting]) =>
+              setting.category === category.id,
+          );
+
+        const heading =
+          document.createElement("button");
+
+        heading.type = "button";
         heading.className =
+          "adpb-section-toggle";
+
+        heading.setAttribute(
+          "aria-expanded",
+          section.classList.contains("is-open")
+            ? "true"
+            : "false",
+        );
+
+        const headingTitle =
+          document.createElement("span");
+
+        headingTitle.className =
           "adpb-section-title";
 
-        heading.textContent =
+        headingTitle.textContent =
           category.title;
 
-        section.appendChild(heading);
+        const headingCount =
+          document.createElement("span");
 
-        for (const [
+        headingCount.className =
+          "adpb-section-count";
+
+        headingCount.textContent =
+          String(categorySettings.length);
+
+        const chevron =
+          document.createElement("span");
+
+        chevron.className =
+          "adpb-section-chevron";
+
+        chevron.setAttribute(
+          "aria-hidden",
+          "true",
+        );
+
+        chevron.textContent = "›";
+
+        heading.appendChild(headingTitle);
+        heading.appendChild(headingCount);
+        heading.appendChild(chevron);
+
+        const content =
+          document.createElement("div");
+
+        content.className =
+          "adpb-section-content";
+
+        heading.addEventListener(
+          "click",
+          () => {
+            const open =
+              !section.classList.contains(
+                "is-open",
+              );
+
+            panel
+              .querySelectorAll(".adpb-section")
+              .forEach((item) => {
+                item.classList.remove("is-open");
+
+                const toggle =
+                  item.querySelector(
+                    ".adpb-section-toggle",
+                  );
+
+                if (toggle) {
+                  toggle.setAttribute(
+                    "aria-expanded",
+                    "false",
+                  );
+                }
+              });
+
+            if (open) {
+              section.classList.add("is-open");
+
+              heading.setAttribute(
+                "aria-expanded",
+                "true",
+              );
+            }
+          },
+        );
+
+        section.appendChild(heading);
+        section.appendChild(content);
+
+        categorySettings.forEach(([
           key,
           setting,
-        ] of Object.entries(Settings)) {
-          if (
-            setting.category !==
-            category.id
-          ) {
-            continue;
-          }
-
+        ], index) => {
           const result =
             this.createSwitch(
               setting,
@@ -2613,14 +2801,54 @@
           result.label.dataset.setting =
             key;
 
-          section.appendChild(
+          if (index >= 5) {
+            result.label.classList.add(
+              "is-extra",
+            );
+          }
+
+          content.appendChild(
             result.label,
           );
+        });
+
+        if (categorySettings.length > 5) {
+          const showMore =
+            document.createElement("button");
+
+          showMore.type = "button";
+          showMore.className =
+            "adpb-show-more";
+
+          showMore.textContent =
+            `Show ${categorySettings.length - 5} more`;
+
+          showMore.setAttribute(
+            "aria-expanded",
+            "false",
+          );
+
+          showMore.addEventListener(
+            "click",
+            () => {
+              const expanded =
+                section.classList.toggle("show-all");
+
+              showMore.textContent = expanded
+                ? "Show fewer"
+                : `Show ${categorySettings.length - 5} more`;
+
+              showMore.setAttribute(
+                "aria-expanded",
+                expanded ? "true" : "false",
+              );
+            },
+          );
+
+          content.appendChild(showMore);
         }
 
-        if (
-          section.children.length > 1
-        ) {
+        if (categorySettings.length > 0) {
           panel.appendChild(section);
         }
       }
