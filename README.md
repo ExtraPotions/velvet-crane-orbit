@@ -17,7 +17,7 @@
   <a href="https://creativecommons.org/licenses/by-nc/4.0/"><img alt="License: CC BY-NC 4.0" src="https://img.shields.io/badge/license-CC%20BY--NC%204.0-lightgrey?style=flat-square" /></a>
 </p>
 
-**Author:** [expDARE](https://github.com/ExtraPotions) · **Latest:** [v0.1.32](https://github.com/ExtraPotions/velvet-crane-orbit/releases/tag/v0.1.32)
+**Author:** [expDARE](https://github.com/ExtraPotions) · **Latest:** [v0.1.33](https://github.com/ExtraPotions/velvet-crane-orbit/releases/tag/v0.1.33)
 
 | Stat | Value |
 |------|-------|
