@@ -50,9 +50,9 @@ Optional: auto-clip coupons, compact search results.
 
 ## Settings
 
-Floating 48px icon button on the right (drag up/down). It detects nearby fixed/sticky action buttons and chooses a clear vertical slot as Amazon’s UI changes. The panel groups the 13 protections into collapsible Promotions, Advertising, Amazon services, AI, Convenience, and Advanced sections, keeping one group open at a time and up to five settings visible by default. Each option uses a keyboard-accessible toggle switch with a short description. Use the prominent **Protection** master switch to pause or resume all cleanup, or **Reset recommended** to restore defaults.
+Floating 48px icon button on the right (drag up/down). It detects nearby fixed/sticky action buttons, avoids dense corners, and chooses a clear vertical slot as Amazon’s UI changes. Drag it beside a page control to remember that dock target for future visits. When multiple ExtraPotions controls are present, this button claims the primary control position. The panel groups the 13 protections into collapsible Promotions, Advertising, Amazon services, AI, Convenience, and Advanced sections, keeping one group open at a time and up to five settings visible by default. Each option uses a keyboard-accessible toggle switch with a short description. Use the prominent **Protection** master switch to pause or resume all cleanup, or **Reset recommended** to restore defaults.
 
-Most changes apply live without a refresh. The panel also shows per-session blocked-item totals by category and lets you clear those stats.
+Most changes apply live without a refresh. The panel also shows per-session blocked-item totals by category and lets you clear those stats. The button’s identity label appears near the safest viewport edge and copies its name when clicked. Reduced-motion preferences are respected automatically, and **High contrast switches** strengthens the control borders and states.
 
 ## License
 

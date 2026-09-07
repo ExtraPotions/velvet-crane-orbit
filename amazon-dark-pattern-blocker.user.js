@@ -498,6 +498,17 @@
     ]),
   );
 
+  const UiSettings = {
+    highContrast: new Setting(
+      "adpb-high-contrast",
+      {
+        displayName: "High contrast switches",
+        description: "Use stronger borders and clearer switch states.",
+        default: false,
+      },
+    ),
+  };
+
   const MasterSetting = {
     get value() {
       try {
@@ -1748,6 +1759,9 @@
     PANEL_ID:
       "adpb-settings-panel",
 
+    LABEL_ID:
+      "adpb-settings-label",
+
     STYLE_ID:
       "adpb-settings-rail-style",
 
@@ -1757,6 +1771,7 @@
 
     panel: null,
     button: null,
+    label: null,
     enabledInput: null,
     statusNode: null,
     statsNode: null,
@@ -1765,7 +1780,8 @@
       return `
 #${this.BTN_ID},
 #${this.PANEL_ID},
-#${this.PANEL_ID} * {
+#${this.PANEL_ID} *,
+#${this.LABEL_ID} {
   box-sizing: border-box !important;
 }
 
@@ -1773,7 +1789,7 @@
   position: fixed !important;
   right: 12px !important;
   left: auto !important;
-  z-index: 2147483000 !important;
+  z-index: 2147483646 !important;
 
   width: 48px !important;
   height: 48px !important;
@@ -1852,6 +1868,45 @@
   border: 2px solid #131921 !important;
 
   pointer-events: none !important;
+}
+
+#${this.LABEL_ID} {
+  position: fixed !important;
+  z-index: 2147483002 !important;
+  display: none !important;
+  max-width: min(240px, calc(100vw - 32px)) !important;
+  min-height: 32px !important;
+  padding: 7px 10px !important;
+  border: 1px solid rgba(255,153,0,.42) !important;
+  border-radius: 8px !important;
+  background: #171a1f !important;
+  color: #f5f5f5 !important;
+  box-shadow: 0 8px 24px rgba(0,0,0,.4) !important;
+  cursor: copy !important;
+  font: 12px/1.25 "Amazon Ember", Arial, sans-serif !important;
+  text-align: left !important;
+  white-space: nowrap !important;
+}
+
+#${this.LABEL_ID}.adpb-label-visible {
+  display: block !important;
+}
+
+#${this.LABEL_ID}:hover,
+#${this.LABEL_ID}:focus-visible {
+  border-color: #ff9900 !important;
+  outline: 2px solid rgba(255,153,0,.32) !important;
+  outline-offset: 2px !important;
+}
+
+#${this.BTN_ID}.adpb-high-contrast,
+#${this.LABEL_ID}.adpb-high-contrast {
+  border: 2px solid #fff !important;
+}
+
+#${this.LABEL_ID}.adpb-high-contrast {
+  background: #000 !important;
+  color: #fff !important;
 }
 
 #${this.BTN_ID}.adpb-disabled .adpb-status-dot {
@@ -2234,6 +2289,47 @@
 
 #${this.PANEL_ID} .adpb-master .adpb-switch-input:checked + .adpb-toggle::after {
   transform: translateX(21px) !important;
+}
+
+#${this.PANEL_ID}.adpb-high-contrast {
+  background: #000 !important;
+  color: #fff !important;
+  border: 2px solid #fff !important;
+}
+
+#${this.PANEL_ID}.adpb-high-contrast .adpb-toggle {
+  border: 2px solid #fff !important;
+}
+
+#${this.PANEL_ID}.adpb-high-contrast .adpb-switch-input:checked + .adpb-toggle {
+  background: #ffb000 !important;
+}
+
+#${this.PANEL_ID} .adpb-preferences {
+  margin-top: 14px !important;
+  padding-top: 12px !important;
+  border-top: 1px solid rgba(255,255,255,.08) !important;
+}
+
+#${this.PANEL_ID} .adpb-preferences-title {
+  margin-bottom: 4px !important;
+  color: #8e96a0 !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  letter-spacing: .08em !important;
+  text-transform: uppercase !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #${this.BTN_ID},
+  #${this.PANEL_ID},
+  #${this.PANEL_ID} *,
+  #${this.LABEL_ID} {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: .01ms !important;
+  }
 }
 
 #${this.PANEL_ID} .adpb-show-more {
@@ -2672,6 +2768,40 @@
         masterInput;
 
       panel.appendChild(master);
+
+      const preferences =
+        document.createElement("section");
+
+      preferences.className =
+        "adpb-preferences";
+
+      const preferencesTitle =
+        document.createElement("div");
+
+      preferencesTitle.className =
+        "adpb-preferences-title";
+
+      preferencesTitle.textContent =
+        "Display";
+
+      preferences.appendChild(
+        preferencesTitle,
+      );
+
+      const contrastSwitch =
+        this.createSwitch(
+          UiSettings.highContrast,
+          () => this.updateAppearance(),
+        );
+
+      contrastSwitch.label.dataset.setting =
+        "highContrast";
+
+      preferences.appendChild(
+        contrastSwitch.label,
+      );
+
+      panel.appendChild(preferences);
 
       for (const category of SETTING_CATEGORIES) {
         const section =
@@ -3169,6 +3299,32 @@
       }
     },
 
+    updateAppearance() {
+      const highContrast =
+        UiSettings.highContrast.value;
+
+      if (this.panel) {
+        this.panel.classList.toggle(
+          "adpb-high-contrast",
+          highContrast,
+        );
+      }
+
+      if (this.button) {
+        this.button.classList.toggle(
+          "adpb-high-contrast",
+          highContrast,
+        );
+      }
+
+      if (this.label) {
+        this.label.classList.toggle(
+          "adpb-high-contrast",
+          highContrast,
+        );
+      }
+    },
+
     mount() {
       if (!document.body) {
         return false;
@@ -3238,8 +3394,56 @@
         statusDot,
       );
 
+      const identityLabel =
+        document.createElement("button");
+
+      identityLabel.type = "button";
+      identityLabel.id = this.LABEL_ID;
+      identityLabel.className =
+        "adpb-label";
+      identityLabel.textContent =
+        "Amazon Dark Pattern Blocker";
+      identityLabel.setAttribute(
+        "aria-label",
+        "Copy Amazon Dark Pattern Blocker identity",
+      );
+      identityLabel.title =
+        "Copy identity name";
+
       this.panel = panel;
       this.button = button;
+      this.label = identityLabel;
+
+      try {
+        const previousPrimary =
+          window.__expdarePrimaryControl;
+
+        if (
+          previousPrimary &&
+          previousPrimary !== button
+        ) {
+          previousPrimary.dataset.expdarePrimary =
+            "false";
+        }
+
+        document
+          .querySelectorAll(
+            '[data-expdare-owner="expDARE"]',
+          )
+          .forEach((control) => {
+            if (control !== button) {
+              control.dataset.expdarePrimary =
+                "false";
+            }
+          });
+
+        button.dataset.expdareOwner =
+          "expDARE";
+        button.dataset.expdarePrimary =
+          "true";
+        window.__expdarePrimaryControl =
+          button;
+      } catch (e) {}
 
       const clampTop = (y) => {
         const max =
@@ -3289,6 +3493,8 @@
           .forEach((node) => {
             if (
               node === button ||
+              node.dataset.expdareOwner ===
+                "expDARE" ||
               node.closest(
                 "#adpb-settings-fab, #adpb-settings-panel",
               )
@@ -3330,13 +3536,45 @@
               top + 48 > rect.top - 10,
           );
 
-        if (!isBlocked(preferred)) {
+        const isDenseCorner = (top) => {
+          const nearTop =
+            top < 96;
+          const nearBottom =
+            top > maxTop - 64;
+
+          if (!nearTop && !nearBottom) {
+            return false;
+          }
+
+          return (
+            blockers.filter((rect) => {
+              const distance =
+                nearTop
+                  ? rect.top
+                  : viewportHeight - rect.bottom;
+
+              return (
+                distance >= -8 &&
+                distance < 128
+              );
+            }).length >= 2
+          );
+        };
+
+        const isSafeSlot = (top) =>
+          !isBlocked(top) &&
+          !isDenseCorner(top);
+
+        if (isSafeSlot(preferred)) {
           return preferred;
         }
 
         const candidates = [
           8,
           maxTop,
+          maxTop / 2,
+          maxTop / 3,
+          (maxTop * 2) / 3,
           preferred,
         ];
 
@@ -3367,12 +3605,203 @@
               Math.max(8, candidate),
             );
 
-          if (!isBlocked(top)) {
+          if (isSafeSlot(top)) {
             return top;
           }
         }
 
         return preferred;
+      };
+
+      const positionLabel = () => {
+        if (
+          !identityLabel.classList.contains(
+            "adpb-label-visible",
+          )
+        ) {
+          return;
+        }
+
+        const buttonRect =
+          button.getBoundingClientRect();
+
+        identityLabel.style.setProperty(
+          "left",
+          "8px",
+          "important",
+        );
+        identityLabel.style.setProperty(
+          "top",
+          "8px",
+          "important",
+        );
+
+        const labelRect =
+          identityLabel.getBoundingClientRect();
+
+        const viewportWidth =
+          window.innerWidth || 1024;
+        const viewportHeight =
+          window.innerHeight || 600;
+        const gap = 8;
+        const candidates = [
+          {
+            left:
+              buttonRect.left -
+              labelRect.width -
+              gap,
+            top:
+              buttonRect.top +
+              (buttonRect.height -
+                labelRect.height) /
+                2,
+          },
+          {
+            left:
+              buttonRect.right + gap,
+            top:
+              buttonRect.top +
+              (buttonRect.height -
+                labelRect.height) /
+                2,
+          },
+          {
+            left: buttonRect.left,
+            top:
+              buttonRect.bottom + gap,
+          },
+          {
+            left: buttonRect.left,
+            top:
+              buttonRect.top -
+              labelRect.height -
+              gap,
+          },
+        ];
+
+        const fits = (candidate) =>
+          candidate.left >= 8 &&
+          candidate.top >= 8 &&
+          candidate.left +
+            labelRect.width <=
+            viewportWidth - 8 &&
+          candidate.top +
+            labelRect.height <=
+            viewportHeight - 8;
+
+        const chosen =
+          candidates.find(fits) || {
+            left: Math.max(
+              8,
+              Math.min(
+                viewportWidth -
+                  labelRect.width -
+                  8,
+                buttonRect.left -
+                  labelRect.width -
+                  gap,
+              ),
+            ),
+            top: Math.max(
+              8,
+              Math.min(
+                viewportHeight -
+                  labelRect.height -
+                  8,
+                buttonRect.top,
+              ),
+            ),
+          };
+
+        identityLabel.style.setProperty(
+          "left",
+          chosen.left + "px",
+          "important",
+        );
+        identityLabel.style.setProperty(
+          "top",
+          chosen.top + "px",
+          "important",
+        );
+      };
+
+      const controlIdentity = (node) => ({
+        id: node.id || "",
+        ariaLabel:
+          node.getAttribute("aria-label") || "",
+        title: node.getAttribute("title") || "",
+        text: (node.textContent || "")
+          .trim()
+          .replace(/s+/g, " ")
+          .slice(0, 80),
+      });
+
+      const findSavedDockRect = (saved) => {
+        if (!saved) return null;
+
+        const viewportWidth =
+          window.innerWidth || 1024;
+        const viewportHeight =
+          window.innerHeight || 600;
+
+        const match = Array.from(
+          document.querySelectorAll(
+            'button, [role="button"], input[type="button"], input[type="submit"], a[role="button"]',
+          ),
+        ).find((node) => {
+          if (
+            node === button ||
+            node.dataset.expdareOwner ===
+              "expDARE" ||
+            node.closest(
+              "#adpb-settings-fab, #adpb-settings-panel, #adpb-settings-label",
+            )
+          ) {
+            return false;
+          }
+
+          const style =
+            window.getComputedStyle(node);
+
+          if (
+            style.position !== "fixed" &&
+            style.position !== "sticky"
+          ) {
+            return false;
+          }
+
+          const rect =
+            node.getBoundingClientRect();
+
+          if (
+            rect.width < 8 ||
+            rect.height < 8 ||
+            rect.right < viewportWidth - 140 ||
+            rect.bottom <= 0 ||
+            rect.top >= viewportHeight
+          ) {
+            return false;
+          }
+
+          const identity =
+            controlIdentity(node);
+
+          if (saved.id) {
+            return identity.id === saved.id;
+          }
+
+          return (
+            (!saved.ariaLabel ||
+              identity.ariaLabel === saved.ariaLabel) &&
+            (!saved.title ||
+              identity.title === saved.title) &&
+            (!saved.text || identity.text === saved.text)
+          );
+        });
+
+        return match
+          ? match.getBoundingClientRect()
+          : null;
       };
 
       const applyFabTop = (
@@ -3404,10 +3833,13 @@
             : clampTop(topPx)) + "px",
           "important",
         );
+
+        positionLabel();
       };
 
       const loadFabTop = () => {
         let saved = null;
+        let dockTarget = null;
 
         try {
           saved =
@@ -3415,7 +3847,22 @@
               "adpb-fabTop",
               null,
             );
+          dockTarget =
+            GM_getValue(
+              "adpb-dockTarget",
+              null,
+            );
         } catch (e) {}
+
+        const dockRect =
+          findSavedDockRect(dockTarget);
+
+        if (dockRect) {
+          return clampTop(
+            dockRect.top +
+              (dockRect.height - 48) / 2,
+          );
+        }
 
         if (
           typeof saved ===
@@ -3492,6 +3939,131 @@
 
       applyFabTop(
         loadFabTop(),
+      );
+
+      let labelHideTimer = null;
+
+      const showLabel = () => {
+        if (labelHideTimer) {
+          window.clearTimeout(labelHideTimer);
+          labelHideTimer = null;
+        }
+
+        identityLabel.classList.add(
+          "adpb-label-visible",
+        );
+
+        positionLabel();
+      };
+
+      const scheduleHideLabel = () => {
+        if (labelHideTimer) {
+          window.clearTimeout(labelHideTimer);
+        }
+
+        labelHideTimer = window.setTimeout(
+          () => {
+            if (
+              document.activeElement ===
+                button ||
+              document.activeElement ===
+                identityLabel
+            ) {
+              return;
+            }
+
+            identityLabel.classList.remove(
+              "adpb-label-visible",
+            );
+          },
+          140,
+        );
+      };
+
+      const copyIdentity = async () => {
+        const identity =
+          identityLabel.dataset.identity ||
+          "Amazon Dark Pattern Blocker";
+
+        try {
+          if (
+            navigator.clipboard &&
+            navigator.clipboard.writeText
+          ) {
+            await navigator.clipboard.writeText(
+              identity,
+            );
+          } else {
+            throw new Error(
+              "Clipboard API unavailable",
+            );
+          }
+        } catch (error) {
+          const helper =
+            document.createElement("textarea");
+
+          helper.value = identity;
+          helper.setAttribute(
+            "readonly",
+            "true",
+          );
+          helper.style.position = "fixed";
+          helper.style.opacity = "0";
+          document.body.appendChild(helper);
+          helper.select();
+
+          try {
+            document.execCommand("copy");
+          } catch (fallbackError) {}
+
+          helper.remove();
+        }
+
+        identityLabel.textContent = "Copied!";
+
+        window.setTimeout(() => {
+          identityLabel.textContent = identity;
+        }, 1200);
+      };
+
+      identityLabel.dataset.identity =
+        identityLabel.textContent;
+
+      button.addEventListener(
+        "pointerenter",
+        showLabel,
+      );
+      button.addEventListener(
+        "pointerleave",
+        scheduleHideLabel,
+      );
+      button.addEventListener(
+        "focus",
+        showLabel,
+      );
+      button.addEventListener(
+        "blur",
+        scheduleHideLabel,
+      );
+      identityLabel.addEventListener(
+        "pointerenter",
+        showLabel,
+      );
+      identityLabel.addEventListener(
+        "pointerleave",
+        scheduleHideLabel,
+      );
+      identityLabel.addEventListener(
+        "focus",
+        showLabel,
+      );
+      identityLabel.addEventListener(
+        "blur",
+        scheduleHideLabel,
+      );
+      identityLabel.addEventListener(
+        "click",
+        copyIdentity,
       );
 
       const drag = {
@@ -3593,12 +4165,88 @@
 
         if (drag.moved) {
           try {
+            const buttonRect =
+              button.getBoundingClientRect();
+            const viewportWidth =
+              window.innerWidth || 1024;
+            const buttonCenter =
+              buttonRect.top +
+              buttonRect.height / 2;
+
+            const dockCandidate =
+              Array.from(
+                document.querySelectorAll(
+                  'button, [role="button"], input[type="button"], input[type="submit"], a[role="button"]',
+                ),
+              )
+                .filter((node) => {
+                  if (
+                    node === button ||
+                    node.dataset.expdareOwner ===
+                      "expDARE" ||
+                    node.closest(
+                      "#adpb-settings-fab, #adpb-settings-panel, #adpb-settings-label",
+                    )
+                  ) {
+                    return false;
+                  }
+
+                  const style =
+                    window.getComputedStyle(node);
+
+                  if (
+                    style.position !== "fixed" &&
+                    style.position !== "sticky"
+                  ) {
+                    return false;
+                  }
+
+                  const rect =
+                    node.getBoundingClientRect();
+
+                  return (
+                    rect.width >= 8 &&
+                    rect.height >= 8 &&
+                    rect.right >=
+                      viewportWidth - 140 &&
+                    Math.abs(
+                      rect.top +
+                        rect.height / 2 -
+                        buttonCenter,
+                    ) < 62 &&
+                    rect.right >=
+                      buttonRect.left - 24
+                  );
+                })
+                .sort((a, b) => {
+                  const aRect =
+                    a.getBoundingClientRect();
+                  const bRect =
+                    b.getBoundingClientRect();
+
+                  return (
+                    Math.abs(
+                      aRect.top +
+                        aRect.height / 2 -
+                        buttonCenter,
+                    ) -
+                    Math.abs(
+                      bRect.top +
+                        bRect.height / 2 -
+                        buttonCenter,
+                    )
+                  );
+                })[0];
+
+            GM_setValue(
+              "adpb-dockTarget",
+              dockCandidate
+                ? controlIdentity(dockCandidate)
+                : null,
+            );
             GM_setValue(
               "adpb-fabTop",
-              clampTop(
-                button.getBoundingClientRect()
-                  .top,
-              ),
+              clampTop(buttonRect.top),
             );
           } catch (e) {}
 
@@ -3723,6 +4371,12 @@
       document.body.appendChild(
         button,
       );
+
+      document.body.appendChild(
+        identityLabel,
+      );
+
+      this.updateAppearance();
 
       this.updateStatus();
       this.updateStats();
