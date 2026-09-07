@@ -1,0 +1,30 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Amazon Dark Pattern Blocker test harness</title>
+<style>body{font:16px system-ui;margin:2rem}li{margin:.5rem 0}.pass{color:#087f23}.fail{color:#b00020}iframe{display:none}</style>
+<h1>Fixture tests</h1><ul id="results"><li>Running…</li></ul>
+<script>
+const results = document.querySelector('#results');
+const pending = new Set(['product', 'search']);
+function report(event) {
+  if (!event.data || event.data.type !== 'adpb-test-result') return;
+  pending.delete(event.data.name);
+  const item = document.createElement('li');
+  item.className = event.data.ok ? 'pass' : 'fail';
+  item.textContent = `${event.data.ok ? 'PASS' : 'FAIL'} ${event.data.name}: ${event.data.details}`;
+  results.append(item);
+  if (!pending.size) results.firstElementChild.remove();
+}
+addEventListener('message', report);
+for (const name of pending) {
+  const frame = document.createElement('iframe');
+  frame.src = `fixtures/${name}.html`;
+  document.body.append(frame);
+}
+setTimeout(() => {
+  for (const name of pending) {
+    const item = document.createElement('li'); item.className = 'fail';
+    item.textContent = `FAIL ${name}: fixture timed out`; results.append(item);
+  }
+}, 5000);
+</script>

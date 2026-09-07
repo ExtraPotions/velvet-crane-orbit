@@ -1,0 +1,17 @@
+<!doctype html><meta charset="utf-8"><title>Search fixture</title>
+<div data-component-type="sp-sponsored-result">Sponsored result</div>
+<script>
+const values = new Map();
+window.GM_getValue = (key, fallback) => values.has(key) ? values.get(key) : fallback;
+window.GM_setValue = (key, value) => values.set(key, value);
+window.GM_registerMenuCommand = () => {};
+history.replaceState({}, '', '/s?k=fixture');
+</script>
+<script src="../../amazon-dark-pattern-blocker.user.js"></script>
+<script>
+setTimeout(() => {
+  const result = document.querySelector('[data-component-type="sp-sponsored-result"]');
+  const hidden = getComputedStyle(result).display === 'none';
+  parent.postMessage({ type:'adpb-test-result', name:'search', ok:hidden, details:`pageDetection=${hidden}` }, '*');
+}, 450);
+</script>

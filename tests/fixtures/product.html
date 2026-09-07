@@ -1,0 +1,36 @@
+<!doctype html><meta charset="utf-8"><title>Product fixture</title>
+<div id="primeDPUpsellStaticContainerNPA">Prime upsell</div>
+<button id="fixture-overlay" style="position:fixed;right:12px;bottom:12px;width:48px;height:48px">Other script</button>
+<button id="unrelated-overlay" style="position:fixed;right:12px;bottom:12px;width:48px;height:48px;z-index:999999">Unrelated overlay</button>
+<script>
+const values = new Map();
+window.GM_getValue = (key, fallback) => values.has(key) ? values.get(key) : fallback;
+window.GM_setValue = (key, value) => values.set(key, value);
+window.GM_registerMenuCommand = () => {};
+history.replaceState({}, '', '/dp/fixture');
+</script>
+<script src="../../amazon-dark-pattern-blocker.user.js"></script>
+<script>
+const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+(async () => {
+  await wait(450);
+  const fab = document.querySelector('#adpb-settings-fab');
+  const upsell = document.querySelector('#primeDPUpsellStaticContainerNPA');
+  const before = fab && fab.getBoundingClientRect().top;
+  window.ExtraPotionsControls.register(document.querySelector('#fixture-overlay'), { owner: 'expDARE', role: 'secondary' });
+  dispatchEvent(new Event('resize'));
+  await wait(80);
+  const overlay = document.querySelector('#fixture-overlay');
+  const moved = !!(overlay.style.getPropertyValue('translate') || overlay.style.translate);
+  const unrelated = document.querySelector('#unrelated-overlay');
+  const unrelatedStayed = !(unrelated.style.getPropertyValue('translate') || unrelated.style.translate);
+  const stable = fab && fab.getBoundingClientRect().top === before;
+  const master = document.querySelector('.adpb-master input');
+  const hiddenInitially = getComputedStyle(upsell).display === 'none';
+  if (master) master.click();
+  await wait(80);
+  const restored = getComputedStyle(upsell).display !== 'none';
+  const ok = !!fab && hiddenInitially && moved && unrelatedStayed && stable && restored;
+  parent.postMessage({ type:'adpb-test-result', name:'product', ok, details:`mount=${!!fab}, selector=${hiddenInitially}, registryCollision=${moved}, unrelatedUnmoved=${unrelatedStayed}, stableDock=${stable}, restoration=${restored}` }, '*');
+})();
+</script>
