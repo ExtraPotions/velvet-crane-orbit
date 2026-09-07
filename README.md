@@ -50,9 +50,30 @@ Optional: auto-clip coupons, compact search results.
 
 ## Settings
 
-Floating 48px icon button on the right (drag up/down). It keeps its saved dock position as the primary control and pushes nearby related userscript overlays away instead of moving. Drag it beside a page control to remember that dock target for future visits. When multiple ExtraPotions controls are present, this button claims the primary control position. The panel groups the 13 protections into collapsible Promotions, Advertising, Amazon services, AI, Convenience, and Advanced sections, keeping one group open at a time and up to five settings visible by default. Each option uses a keyboard-accessible toggle switch with a short description. Use the prominent **Protection** master switch to pause or resume all cleanup, or **Reset recommended** to restore defaults.
+Floating 48px icon button on the right (drag up/down). It keeps its saved dock position as the primary control and pushes registered ExtraPotions overlays away instead of moving. Drag it beside a page control to remember that dock target for future visits. The panel groups the 13 protections into collapsible Promotions, Advertising, Amazon services, AI, Convenience, and Advanced sections, keeping one group open at a time and up to five settings visible by default. Each option uses a keyboard-accessible toggle switch with a short description. Use the prominent **Protection** master switch to pause or resume all cleanup, or **Reset recommended** to restore defaults.
 
 Most changes apply live without a refresh. The panel also shows per-session blocked-item totals by category and lets you clear those stats. The button’s identity label appears near the safest viewport edge and copies its name when clicked. Reduced-motion preferences are respected automatically, and **High contrast switches** strengthens the control borders and states.
+
+### ExtraPotions control coordination
+
+Controls from another ExtraPotions userscript can opt in to make room for this primary dock. Register its fixed or sticky element after it is created:
+
+```js
+window.ExtraPotionsControls.register(controlElement, {
+  owner: "expDARE",
+  role: "secondary",
+});
+```
+
+No unrelated page element is moved based on its z-index.
+
+## Testing
+
+The dependency-free browser fixtures cover product and search selectors, master-toggle restoration, registry collision handling, stable docking, and page-type detection. Run `node tests/server.mjs`, then open <http://localhost:4173/tests/harness.html>.
+
+## Releases
+
+Run `powershell -ExecutionPolicy Bypass -File scripts/release.ps1 -Version 0.1.34` from the repository root. It updates the script and README version, commits, tags, and pushes. The tag-triggered GitHub workflow verifies the version, generates release notes, and uploads the userscript and icons.
 
 ## License
 

@@ -509,6 +509,110 @@
     ),
   };
 
+  // Small opt-in coordination surface for ExtraPotions overlays. Other
+  // scripts can register secondary controls so the primary dock can make
+  // room for them without guessing from z-index values.
+  const ControlRegistry = (() => {
+    const existing =
+      window.ExtraPotionsControls;
+
+    const api =
+      existing &&
+      Array.isArray(existing.controls) &&
+      typeof existing.register === "function"
+        ? existing
+        : {
+            controls: [],
+
+            register(element, options = {}) {
+              if (!element) return null;
+
+              this.controls =
+                this.controls.filter(
+                  (entry) =>
+                    entry.element &&
+                    entry.element.isConnected !== false,
+                );
+
+              let entry =
+                this.controls.find(
+                  (item) =>
+                    item.element === element,
+                );
+
+              if (!entry) {
+                entry = {
+                  element,
+                  owner: options.owner || "expDARE",
+                  role: options.role || "secondary",
+                  primary: !!options.primary,
+                };
+                this.controls.push(entry);
+              } else {
+                Object.assign(entry, options);
+              }
+
+              element.dataset.expdareControl =
+                "true";
+              element.dataset.expdareOwner =
+                entry.owner;
+
+              return entry;
+            },
+
+            claimPrimary(element) {
+              this.controls.forEach(
+                (entry) => {
+                  entry.primary = false;
+                  if (entry.element) {
+                    entry.element.dataset.expdarePrimary =
+                      "false";
+                  }
+                },
+              );
+
+              const entry =
+                this.register(element, {
+                  owner: "expDARE",
+                  role: "primary",
+                  primary: true,
+                });
+
+              if (entry) {
+                entry.primary = true;
+                entry.element.dataset.expdarePrimary =
+                  "true";
+              }
+
+              return entry;
+            },
+          };
+
+    if (typeof api.claimPrimary !== "function") {
+      api.claimPrimary = function (element) {
+        (api.controls || []).forEach((entry) => {
+          entry.primary = false;
+          if (entry.element) {
+            entry.element.dataset.expdarePrimary = "false";
+          }
+        });
+        const entry = api.register(element, {
+          owner: "expDARE",
+          role: "primary",
+          primary: true,
+        });
+        if (entry && entry.element) {
+          entry.primary = true;
+          entry.element.dataset.expdarePrimary = "true";
+        }
+        return entry;
+      };
+    }
+
+    window.ExtraPotionsControls = api;
+    return api;
+  })();
+
   const MasterSetting = {
     get value() {
       try {
@@ -3415,34 +3519,8 @@
       this.label = identityLabel;
 
       try {
-        const previousPrimary =
-          window.__expdarePrimaryControl;
-
-        if (
-          previousPrimary &&
-          previousPrimary !== button
-        ) {
-          previousPrimary.dataset.expdarePrimary =
-            "false";
-        }
-
-        document
-          .querySelectorAll(
-            '[data-expdare-owner="expDARE"]',
-          )
-          .forEach((control) => {
-            if (control !== button) {
-              control.dataset.expdarePrimary =
-                "false";
-            }
-          });
-
-        button.dataset.expdareOwner =
-          "expDARE";
-        button.dataset.expdarePrimary =
-          "true";
-        window.__expdarePrimaryControl =
-          button;
+        ControlRegistry.claimPrimary(button);
+        window.__expdarePrimaryControl = button;
       } catch (e) {}
 
       const clampTop = (y) => {
@@ -3487,10 +3565,23 @@
         const blockers = [];
 
         document
-          .querySelectorAll(
-            'button, [role="button"], input[type="button"], input[type="submit"], a[role="button"]',
-          )
+          .querySelectorAll('[data-adpb-pushed="true"]')
           .forEach((node) => {
+            node.style.removeProperty("translate");
+            delete node.dataset.adpbPushed;
+          });
+
+        const registeredControls = (ControlRegistry.controls || [])
+          .filter((entry) =>
+            entry &&
+            entry.element &&
+            entry.element.isConnected !== false &&
+            entry.role !== "primary" &&
+            entry.owner === "expDARE",
+          )
+          .map((entry) => entry.element);
+
+        registeredControls.forEach((node) => {
             if (
               node === button ||
               node.dataset.expdareOwner ===
@@ -3734,11 +3825,34 @@
           buttonRect.top +
           buttonRect.height / 2;
 
+        const registeredControls = new Set(
+          (ControlRegistry.controls || [])
+            .filter((entry) =>
+              entry &&
+              entry.element &&
+              entry.element.isConnected !== false &&
+              entry.role !== "primary" &&
+              entry.owner === "expDARE",
+            )
+            .map((entry) => entry.element),
+        );
+
+        document
+          .querySelectorAll('[data-adpb-pushed="true"]')
+          .forEach((node) => {
+            node.style.removeProperty("translate");
+            delete node.dataset.adpbPushed;
+          });
+
         document
           .querySelectorAll(
             'button, [role="button"], input[type="button"], input[type="submit"], a[role="button"]',
           )
           .forEach((node) => {
+            if (!registeredControls.has(node)) {
+              return;
+            }
+
             if (
               node === button ||
               node === identityLabel ||
@@ -3749,22 +3863,9 @@
               return;
             }
 
-            const style =
-              window.getComputedStyle(node);
-            const zIndex =
-              parseInt(style.zIndex, 10) || 0;
-
-            // Only move controls that opt into the ExtraPotions protocol or
-            // are clearly userscript overlays (very high stacking context).
-            const related =
-              node.dataset.expdareOwner ===
-                "expDARE" ||
-              node.dataset.expdareControl ===
-                "true" ||
-              zIndex >= 100000;
+            const style = window.getComputedStyle(node);
 
             if (
-              !related ||
               (style.position !== "fixed" &&
                 style.position !== "sticky")
             ) {
