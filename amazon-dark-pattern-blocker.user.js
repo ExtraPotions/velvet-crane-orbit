@@ -3255,7 +3255,130 @@
         );
       };
 
-      const applyFabTop = (topPx) => {
+      const findClearTop = (requestedTop) => {
+        const viewportHeight =
+          window.innerHeight || 600;
+
+        const maxTop =
+          Math.max(
+            8,
+            viewportHeight - 56,
+          );
+
+        const preferred =
+          Math.min(
+            maxTop,
+            Math.max(8, requestedTop),
+          );
+
+        const viewportWidth =
+          window.innerWidth || 1024;
+
+        const fabLeft =
+          viewportWidth - 12 - 48;
+
+        const fabRight =
+          viewportWidth - 12;
+
+        const blockers = [];
+
+        document
+          .querySelectorAll(
+            'button, [role="button"], input[type="button"], input[type="submit"], a[role="button"]',
+          )
+          .forEach((node) => {
+            if (
+              node === button ||
+              node.closest(
+                "#adpb-settings-fab, #adpb-settings-panel",
+              )
+            ) {
+              return;
+            }
+
+            const style =
+              window.getComputedStyle(node);
+
+            if (
+              style.position !== "fixed" &&
+              style.position !== "sticky"
+            ) {
+              return;
+            }
+
+            const rect =
+              node.getBoundingClientRect();
+
+            if (
+              rect.width < 8 ||
+              rect.height < 8 ||
+              rect.bottom <= 0 ||
+              rect.top >= viewportHeight ||
+              rect.right < fabLeft - 10 ||
+              rect.left > fabRight + 10
+            ) {
+              return;
+            }
+
+            blockers.push(rect);
+          });
+
+        const isBlocked = (top) =>
+          blockers.some(
+            (rect) =>
+              top < rect.bottom + 10 &&
+              top + 48 > rect.top - 10,
+          );
+
+        if (!isBlocked(preferred)) {
+          return preferred;
+        }
+
+        const candidates = [
+          8,
+          maxTop,
+          preferred,
+        ];
+
+        blockers.forEach((rect) => {
+          candidates.push(
+            rect.top - 48 - 10,
+            rect.bottom + 10,
+          );
+        });
+
+        candidates
+          .map((top) =>
+            Math.min(
+              maxTop,
+              Math.max(8, top),
+            ),
+          )
+          .sort(
+            (a, b) =>
+              Math.abs(a - preferred) -
+              Math.abs(b - preferred),
+          );
+
+        for (const candidate of candidates) {
+          const top =
+            Math.min(
+              maxTop,
+              Math.max(8, candidate),
+            );
+
+          if (!isBlocked(top)) {
+            return top;
+          }
+        }
+
+        return preferred;
+      };
+
+      const applyFabTop = (
+        topPx,
+        avoidButtons = true,
+      ) => {
         button.style.setProperty(
           "right",
           "12px",
@@ -3276,7 +3399,9 @@
 
         button.style.setProperty(
           "top",
-          clampTop(topPx) + "px",
+          (avoidButtons
+            ? findClearTop(topPx)
+            : clampTop(topPx)) + "px",
           "important",
         );
       };
@@ -3496,6 +3621,25 @@
         "pointercancel",
         endDrag,
       );
+
+      // Amazon and other storefront widgets can mount fixed buttons after
+      // this userscript. Re-check the rail periodically when the user is not
+      // actively dragging so the control does not cover a newly-added action.
+      window.setInterval(() => {
+        if (drag.active) {
+          return;
+        }
+
+        applyFabTop(loadFabTop());
+
+        if (
+          panel.classList.contains(
+            "adpb-open",
+          )
+        ) {
+          this.placePanel();
+        }
+      }, 1500);
 
       button.addEventListener(
         "click",

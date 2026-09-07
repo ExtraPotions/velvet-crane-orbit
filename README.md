@@ -50,7 +50,7 @@ Optional: auto-clip coupons, compact search results.
 
 ## Settings
 
-Floating 48px icon button on the right (drag up/down). The panel groups the 13 protections into collapsible Promotions, Advertising, Amazon services, AI, Convenience, and Advanced sections, keeping one group open at a time and up to five settings visible by default. Each option uses a keyboard-accessible toggle switch with a short description. Use the prominent **Protection** master switch to pause or resume all cleanup, or **Reset recommended** to restore defaults.
+Floating 48px icon button on the right (drag up/down). It detects nearby fixed/sticky action buttons and chooses a clear vertical slot as Amazon’s UI changes. The panel groups the 13 protections into collapsible Promotions, Advertising, Amazon services, AI, Convenience, and Advanced sections, keeping one group open at a time and up to five settings visible by default. Each option uses a keyboard-accessible toggle switch with a short description. Use the prominent **Protection** master switch to pause or resume all cleanup, or **Reset recommended** to restore defaults.
 
 Most changes apply live without a refresh. The panel also shows per-session blocked-item totals by category and lets you clear those stats.
 
