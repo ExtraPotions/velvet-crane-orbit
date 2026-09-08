@@ -6,7 +6,7 @@ const {chromium}=require('playwright');const fs=require('node:fs');const assert=
   await context.addInitScript(()=>{window.GM_getValue=(k,d)=>JSON.parse(localStorage.getItem(k)||JSON.stringify(d));window.GM_setValue=(k,v)=>localStorage.setItem(k,JSON.stringify(v));window.GM_registerMenuCommand=()=>{};});
   await context.addInitScript({content:fs.readFileSync('amazon-dark-pattern-blocker.user.js','utf8')});
   const page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));page.on('console',msg=>{if(msg.type()==='error')console.log(msg.text());});
-  await page.goto('https://www.amazon.com/dp/fixture');await page.waitForTimeout(100);assert.deepEqual(errors,[]);const fab=page.getByRole('button',{name:'Dark Pattern Blocker settings',exact:true});await fab.click({timeout:3000});
+  await page.goto('https://www.amazon.com/dp/fixture');await page.waitForTimeout(100);assert.deepEqual(errors,[]);const fab=page.getByRole('button',{name:'Dark Pattern Blocker settings',exact:true});const fabBox=await fab.boundingBox(),iconBox=await fab.locator('img').boundingBox();assert(iconBox.x>=fabBox.x&&iconBox.y>=fabBox.y&&iconBox.x+iconBox.width<=fabBox.x+fabBox.width&&iconBox.y+iconBox.height<=fabBox.y+fabBox.height);assert.equal(iconBox.width,26);assert.equal(iconBox.height,26);await fab.click({timeout:3000});
   const panel=page.getByRole('dialog');assert.equal(await panel.isVisible(),true);assert.equal((await panel.boundingBox()).width,312);
   assert.equal(await panel.locator('[type=checkbox]').count(),0);assert.equal(await panel.locator('[role=switch]').count(),15);
   const master=panel.getByRole('switch',{name:'Protection',exact:true});assert.equal((await master.boundingBox()).width,36);
@@ -14,6 +14,13 @@ const {chromium}=require('playwright');const fs=require('node:fs');const assert=
   assert.equal(await page.locator('#primeDPUpsellStaticContainerNPA').isVisible(),true);
   await master.press('Space');assert.equal(await master.getAttribute('aria-checked'),'true');
   await page.waitForTimeout(350);
+  assert.equal(await page.locator('#primeDPUpsellStaticContainerNPA').isVisible(),false);
+  const prime=panel.getByRole('switch',{name:'Remove Prime upsells',exact:true});
+  await prime.click();assert.equal(await prime.getAttribute('aria-checked'),'false');
+  await page.waitForTimeout(50);
+  assert.equal(await page.locator('#primeDPUpsellStaticContainerNPA').isVisible(),true);
+  await prime.click();assert.equal(await prime.getAttribute('aria-checked'),'true');
+  await page.waitForTimeout(50);
   assert.equal(await page.locator('#primeDPUpsellStaticContainerNPA').isVisible(),false);
   const saved=await fab.boundingBox();
   await page.evaluate(()=>{const secondary=document.createElement('button');secondary.dataset.expdareControl='secondary';secondary.id='test-companion';secondary.style.cssText='position:fixed;right:16px;bottom:16px;width:48px;height:48px;padding:0';document.body.append(secondary);const unrelated=secondary.cloneNode();unrelated.removeAttribute('data-expdare-control');unrelated.id='test-unrelated';document.body.append(unrelated);});
