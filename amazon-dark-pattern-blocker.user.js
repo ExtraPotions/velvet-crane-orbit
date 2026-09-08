@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Amazon Dark Pattern Blocker
 // @namespace      https://github.com/ExtraPotions/velvet-crane-orbit
-// @version        0.1.41
+// @version        0.1.42
 // @description    Remove Amazon dark patterns + floating settings; major amazon.* storefronts
 // @author         expDARE
 // @license        CC-BY-NC-4.0
@@ -30,7 +30,7 @@
 // @match          https://amazon.com.mx/*
 // @match          https://www.amazon.nl/*
 // @match          https://amazon.nl/*
-// @icon           https://raw.githubusercontent.com/ExtraPotions/velvet-crane-orbit/v0.1.41/icon-128.png
+// @icon           https://raw.githubusercontent.com/ExtraPotions/velvet-crane-orbit/v0.1.42/icon-128.png
 // @run-at         document-start
 // @downloadURL    https://github.com/ExtraPotions/velvet-crane-orbit/releases/latest/download/amazon-dark-pattern-blocker.user.js
 // @updateURL      https://github.com/ExtraPotions/velvet-crane-orbit/releases/latest/download/amazon-dark-pattern-blocker.user.js
@@ -53,7 +53,7 @@
 (function () {
   "use strict";
 
-  const VERSION = "0.1.41";
+  const VERSION = "0.1.42";
   // ============================================================
   // CONFIGURATION
   // ============================================================
@@ -1729,6 +1729,12 @@
 
   let processTimer = null;
   let lastProcessedUrl = location.href;
+  let lastProcessedAt = 0;
+  const diagnosticErrors = [];
+  function diagnosticsText() {
+    const active = Object.values(Settings).filter((setting) => setting.value).length;
+    return [`Amazon Dark Pattern Blocker ${VERSION}`, `Site: ${location.hostname}`, `Page: ${getPageType()} (${location.pathname || "/"})`, `Active protections: ${active}/${Object.keys(Settings).length}`, `Blocked this session: ${Stats.total}`, `Last processed: ${lastProcessedAt ? new Date(lastProcessedAt).toISOString() : "Not yet"}`, `Errors: ${diagnosticErrors.length}${diagnosticErrors.length ? " · " + diagnosticErrors.at(-1) : ""}`].join("\n");
+  }
 
   function processPage() {
     if (!MasterSetting.value) {
@@ -1751,9 +1757,12 @@
 
       lastProcessedUrl =
         location.href;
+      lastProcessedAt = Date.now();
 
       SettingsRail.updateStatus();
+      SettingsRail.updateDiagnostics();
     } catch (error) {
+      diagnosticErrors.push(String(error && error.message || error));
       debug(
         "Error during processing:",
         error,
@@ -2403,6 +2412,7 @@
 #${this.PANEL_ID} .adpb-submenu .adpb-stats-heading {
   margin-bottom: 4px !important;
 }
+#${this.PANEL_ID} .adpb-diagnostics { white-space:pre-wrap;overflow-wrap:anywhere;margin:0;padding:8px;background:#101216;color:#d8d8d8;border-radius:6px;font:11px/1.35 ui-monospace,monospace; }
 
 #${this.PANEL_ID} .adpb-submenu .adpb-clear-stats {
   width: 100% !important;
@@ -3095,7 +3105,7 @@
           "adpb-section-count";
 
         const nestedMenuCount =
-          category.id === "advanced" ? 2 : 0;
+          category.id === "advanced" ? 3 : 0;
 
         headingCount.textContent =
           String(
@@ -3492,6 +3502,24 @@
           content.appendChild(
             statsMenu.root,
           );
+
+          const diagnosticsMenu = makeSubmenu("About & diagnostics");
+          const diagnosticsOutput = document.createElement("pre");
+          diagnosticsOutput.className = "adpb-diagnostics";
+          diagnosticsOutput.textContent = diagnosticsText();
+          this.diagnosticsNode = diagnosticsOutput;
+          diagnosticsMenu.body.appendChild(diagnosticsOutput);
+          const copyDiagnostics = document.createElement("button");
+          copyDiagnostics.type = "button";
+          copyDiagnostics.className = "adpb-clear-stats";
+          copyDiagnostics.textContent = "Copy diagnostics";
+          copyDiagnostics.addEventListener("click", async (event) => {
+            event.stopPropagation();
+            const text = diagnosticsText();
+            try { await navigator.clipboard.writeText(text); } catch (error) { window.prompt("Copy diagnostics", text); }
+          });
+          diagnosticsMenu.body.appendChild(copyDiagnostics);
+          content.appendChild(diagnosticsMenu.root);
         }
 
         if (
@@ -3601,7 +3629,12 @@
         },
       );
 
+      this.updateDiagnostics();
       this.updateStatus();
+    },
+
+    updateDiagnostics() {
+      if (this.diagnosticsNode) this.diagnosticsNode.textContent = diagnosticsText();
     },
 
     updateStatus() {

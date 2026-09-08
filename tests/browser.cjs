@@ -12,6 +12,7 @@ const {chromium}=require('playwright');const fs=require('node:fs');const assert=
   assert.equal(await panel.locator('.adpb-section-chevron').first().textContent(),'›');
   assert.equal(await panel.locator('.adpb-submenu-chevron').first().textContent(),'›');
   assert.equal(await panel.locator('[type=checkbox]').count(),0);assert.equal(await panel.locator('[role=switch]').count(),14);
+  await panel.getByRole('button',{name:/^Advanced/}).click();await panel.getByText('About & diagnostics',{exact:true}).click();assert.match(await panel.locator('.adpb-diagnostics').textContent(),/Amazon Dark Pattern Blocker 0\.1\.42[\s\S]*Active protections:/);await panel.getByRole('button',{name:/^Promotions/}).click();
   const master=panel.getByRole('switch',{name:'Protection',exact:true});assert.equal((await master.boundingBox()).width,36);
   await master.click();assert.equal(await master.getAttribute('aria-checked'),'false');
   assert.equal(await page.locator('#primeDPUpsellStaticContainerNPA').isVisible(),true);
