@@ -7,12 +7,13 @@ const {chromium}=require('playwright');const fs=require('node:fs');const assert=
   await context.addInitScript({content:fs.readFileSync('amazon-dark-pattern-blocker.user.js','utf8')});
   const page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));page.on('console',msg=>{if(msg.type()==='error')console.log(msg.text());});
   await page.goto('https://www.amazon.com/dp/fixture');await page.waitForTimeout(100);assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('adpb-settings-schema'))),1,'settings migrate to schema 1');assert.deepEqual(errors,[]);const fab=page.getByRole('button',{name:'Dark Pattern Blocker settings',exact:true});const fabBox=await fab.boundingBox(),iconBox=await fab.locator('img').boundingBox();assert(iconBox.x>=fabBox.x&&iconBox.y>=fabBox.y&&iconBox.x+iconBox.width<=fabBox.x+fabBox.width&&iconBox.y+iconBox.height<=fabBox.y+fabBox.height);assert.equal(iconBox.width,26);assert.equal(iconBox.height,26);await fab.click({timeout:3000});
+  await page.waitForFunction(()=>document.getElementById('adpb-ui-root')?.dataset.launcherOccupiedArea);const declaration=await page.locator('#adpb-ui-root').evaluate(el=>({...el.dataset}));assert.equal(declaration.userscriptLauncher,'userscript-launcher-v1');assert.equal(declaration.launcherOwner,'expDARE');assert.equal(declaration.launcherPriority,'100');assert.equal(declaration.launcherPreferredPosition,'right-bottom');assert.doesNotThrow(()=>JSON.parse(declaration.launcherOccupiedArea));
   const panel=page.getByRole('dialog');assert.equal(await panel.isVisible(),true);assert.equal((await panel.boundingBox()).width,312);
   assert.equal(await panel.getByRole('button',{name:'Close settings'}).textContent(),'×');
   assert.equal(await panel.locator('.adpb-section-chevron').first().textContent(),'›');
   assert.equal(await panel.locator('.adpb-submenu-chevron').first().textContent(),'›');
   assert.equal(await panel.locator('[type=checkbox]').count(),0);assert.equal(await panel.locator('[role=switch]').count(),14);
-  await panel.getByRole('button',{name:/^Advanced/}).click();await panel.getByText('About & diagnostics',{exact:true}).click();assert.match(await panel.locator('.adpb-diagnostics').textContent(),/Amazon Dark Pattern Blocker 0\.1\.42[\s\S]*Active protections:/);await panel.getByRole('button',{name:/^Promotions/}).click();
+  await panel.getByRole('button',{name:/^Advanced/}).click();await panel.getByText('About & diagnostics',{exact:true}).click();assert.match(await panel.locator('.adpb-diagnostics').textContent(),/Amazon Dark Pattern Blocker 0\.1\.43[\s\S]*Active protections:/);await panel.getByRole('button',{name:/^Promotions/}).click();
   const master=panel.getByRole('switch',{name:'Protection',exact:true});assert.equal((await master.boundingBox()).width,36);
   await master.click();assert.equal(await master.getAttribute('aria-checked'),'false');
   assert.equal(await page.locator('#primeDPUpsellStaticContainerNPA').isVisible(),true);
@@ -27,7 +28,7 @@ const {chromium}=require('playwright');const fs=require('node:fs');const assert=
   await page.waitForTimeout(50);
   assert.equal(await page.locator('#primeDPUpsellStaticContainerNPA').isVisible(),false);
   const saved=await fab.boundingBox();
-  await page.evaluate(()=>{const secondary=document.createElement('button');secondary.dataset.expdareControl='secondary';secondary.id='test-companion';secondary.style.cssText='position:fixed;right:16px;bottom:16px;width:48px;height:48px;padding:0';document.body.append(secondary);const unrelated=secondary.cloneNode();unrelated.removeAttribute('data-expdare-control');unrelated.id='test-unrelated';document.body.append(unrelated);});
+  await page.evaluate(()=>{const secondary=document.createElement('button');secondary.dataset.userscriptLauncher='userscript-launcher-v1';secondary.dataset.launcherOwner='expDARE';secondary.dataset.launcherId='test-companion';secondary.dataset.launcherPriority='50';secondary.dataset.launcherPreferredPosition='right-bottom';secondary.id='test-companion';secondary.style.cssText='position:fixed;right:16px;bottom:16px;width:48px;height:48px;padding:0';document.body.append(secondary);const unrelated=secondary.cloneNode();for(const key of ['userscriptLauncher','launcherOwner','launcherId','launcherPriority','launcherPreferredPosition'])delete unrelated.dataset[key];unrelated.id='test-unrelated';document.body.append(unrelated);});
   const unrelatedBefore=await page.locator('#test-unrelated').boundingBox();await page.waitForTimeout(1700);
   assert.equal((await fab.boundingBox()).y,saved.y);
   assert((await page.locator('#test-companion').boundingBox()).x<saved.x-48);

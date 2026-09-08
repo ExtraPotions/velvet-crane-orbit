@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Amazon Dark Pattern Blocker
 // @namespace      https://github.com/ExtraPotions/velvet-crane-orbit
-// @version        0.1.42
+// @version        0.1.43
 // @description    Remove Amazon dark patterns + floating settings; major amazon.* storefronts
 // @author         expDARE
 // @license        CC-BY-NC-4.0
@@ -30,7 +30,7 @@
 // @match          https://amazon.com.mx/*
 // @match          https://www.amazon.nl/*
 // @match          https://amazon.nl/*
-// @icon           https://raw.githubusercontent.com/ExtraPotions/velvet-crane-orbit/v0.1.42/icon-128.png
+// @icon           https://raw.githubusercontent.com/ExtraPotions/velvet-crane-orbit/v0.1.43/icon-128.png
 // @run-at         document-start
 // @downloadURL    https://github.com/ExtraPotions/velvet-crane-orbit/releases/latest/download/amazon-dark-pattern-blocker.user.js
 // @updateURL      https://github.com/ExtraPotions/velvet-crane-orbit/releases/latest/download/amazon-dark-pattern-blocker.user.js
@@ -53,7 +53,7 @@
 (function () {
   "use strict";
 
-  const VERSION = "0.1.42";
+  const VERSION = "0.1.43";
   // ============================================================
   // CONFIGURATION
   // ============================================================
@@ -1903,7 +1903,9 @@
 
   // DOM-based opt-in works across userscript sandboxes; only expDARE companions yield.
   function coordinateExpdareControls(anchor, registered = []) {
-    const candidates = new Set([...document.querySelectorAll('[data-expdare-control="secondary"],#pfh-fab,.pfh-fab'), ...registered]);
+    const candidates = new Set([...document.querySelectorAll('[data-userscript-launcher="userscript-launcher-v1"],[data-expdare-control="secondary"],#pfh-fab,.pfh-fab'), ...registered]);
+    const anchorNode=anchor.getRootNode().host||anchor;
+    const anchorPriority=Number(anchorNode.dataset.launcherPriority||100);
     const primary = [anchor];
     for (const host of document.querySelectorAll('[data-expdare-dock-root]')) {
       const control = host.shadowRoot?.querySelector('[data-expdare-control="primary"]');
@@ -1913,7 +1915,7 @@
     const origin=anchor.getBoundingClientRect();
     const overlaps=r=>occupied.some(o=>r.left<o.right+8&&r.right>o.left-8&&r.top<o.bottom+8&&r.bottom>o.top-8);
     for (const el of candidates) {
-      if (!el.isConnected || primary.includes(el) || el.dataset.expdareControl==='primary') continue;
+      if (!el.isConnected || el===anchorNode || primary.includes(el) || el.dataset.expdareControl==='primary' || Number(el.dataset.launcherPriority||0)>=anchorPriority) continue;
       const ownerRoot=el.getRootNode().host;
       if(ownerRoot?.dataset.expdareDockRoot==='primary')continue;
       let rect=el.getBoundingClientRect();
@@ -1933,6 +1935,12 @@
       }
       occupied.push(rect);
     }
+  }
+  const LAUNCHER_PROTOCOL='userscript-launcher-v1';
+  function declareLauncher(node,controls,meta){
+    node.dataset.userscriptLauncher=LAUNCHER_PROTOCOL;node.dataset.launcherOwner=meta.owner;node.dataset.launcherId=meta.id;node.dataset.launcherPriority=String(meta.priority);node.dataset.launcherPreferredPosition=meta.preferredPosition;
+    let frame=0;const publish=()=>{frame=0;const rects=controls().filter(el=>el?.isConnected&&el.getClientRects().length).map(el=>el.getBoundingClientRect());if(!rects.length)return;const area={left:Math.round(Math.min(...rects.map(r=>r.left))),top:Math.round(Math.min(...rects.map(r=>r.top))),right:Math.round(Math.max(...rects.map(r=>r.right))),bottom:Math.round(Math.max(...rects.map(r=>r.bottom)))};node.dataset.launcherOccupiedArea=JSON.stringify(area);window.dispatchEvent(new CustomEvent('userscript-launcher:change',{detail:{protocol:LAUNCHER_PROTOCOL,owner:meta.owner,id:meta.id,priority:meta.priority,preferredPosition:meta.preferredPosition,occupiedArea:area}}));};
+    const schedule=()=>{if(!frame)frame=requestAnimationFrame(publish);};if(typeof ResizeObserver!=='undefined'){const observer=new ResizeObserver(schedule);for(const el of controls().filter(Boolean))observer.observe(el);}window.addEventListener('resize',schedule,{passive:true});return{publish:schedule};
   }
   const SettingsRail = {
     BTN_ID:
@@ -3794,6 +3802,7 @@
         "button";
       button.dataset.expdareControl='primary';
       button.setAttribute('aria-controls',this.PANEL_ID);
+      this.launcherDeclaration=declareLauncher(this.host,()=>[button,panel],{owner:'expDARE',id:'amazon-dark-pattern-blocker',priority:100,preferredPosition:'right-bottom'});
 
       button.title =
         "Dark Pattern Blocker settings";

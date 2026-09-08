@@ -4,7 +4,7 @@
 
 Remove common Amazon dark patterns while keeping control over the protections you want.
 
-**Version 0.1.42** · By [expDARE](https://github.com/ExtraPotions)
+**Version 0.1.43** · By [expDARE](https://github.com/ExtraPotions)
 
 ## Features
 
@@ -22,6 +22,7 @@ Remove common Amazon dark patterns while keeping control over the protections yo
 - Remembered launcher placement, including a preferred position beside a page control.
 - Versioned settings are validated and migrated automatically when updating.
 - Collapsible diagnostics report page detection, active protections, session totals, processing time and captured errors.
+- A launcher coordination protocol publishes ownership, primary priority, preferred placement and occupied space for predictable companion positioning.
 
 Supports Amazon storefronts in the US, UK, Canada, Germany, France, Italy, Spain, Japan, Australia, India, Mexico and the Netherlands. Most settings apply immediately.
 
