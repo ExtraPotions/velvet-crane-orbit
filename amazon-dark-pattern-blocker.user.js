@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Amazon Dark Pattern Blocker
 // @namespace      https://github.com/ExtraPotions/velvet-crane-orbit
-// @version        0.1.38
+// @version        0.1.39
 // @description    Remove Amazon dark patterns + floating settings; major amazon.* storefronts
 // @author         expDARE
 // @license        CC-BY-NC-4.0
@@ -30,7 +30,7 @@
 // @match          https://amazon.com.mx/*
 // @match          https://www.amazon.nl/*
 // @match          https://amazon.nl/*
-// @icon           https://raw.githubusercontent.com/ExtraPotions/velvet-crane-orbit/v0.1.38/icon-128.png
+// @icon           https://raw.githubusercontent.com/ExtraPotions/velvet-crane-orbit/v0.1.39/icon-128.png
 // @run-at         document-start
 // @downloadURL    https://github.com/ExtraPotions/velvet-crane-orbit/releases/latest/download/amazon-dark-pattern-blocker.user.js
 // @updateURL      https://github.com/ExtraPotions/velvet-crane-orbit/releases/latest/download/amazon-dark-pattern-blocker.user.js
@@ -231,10 +231,6 @@
           "#feedbackSurvey_feature_div",
       },
 
-      homepageClutter: {
-        setting: "removeHomepageClutter",
-      },
-
       amazonBusinessPromos: {
         setting: "removeAmazonBusinessPromos",
 
@@ -423,13 +419,6 @@
       displayName: "Compact search results",
       description: "Reduce spacing between search results.",
       category: "convenience",
-      default: false,
-    },
-
-    removeHomepageClutter: {
-      displayName: "Remove homepage clutter",
-      description: "Extra homepage cleanup. Disabled by default for safety.",
-      category: "advanced",
       default: false,
     },
   };
@@ -628,14 +617,6 @@
       } catch (e) {}
     },
   };
-
-  // One-time migration from 0.1.11.
-  try {
-    if (GM_getValue("adpbMigrate011", true)) {
-      GM_setValue("removeHomepageClutter", false);
-      GM_setValue("adpbMigrate011", false);
-    }
-  } catch (e) {}
 
   // ============================================================
   // SESSION STATS
@@ -1288,13 +1269,6 @@
       return this.removeByCategory(
         "amazonBusinessPromos",
         "removeAmazonBusinessPromos",
-      );
-    },
-
-    processHomepageClutter() {
-      return this.removeByCategory(
-        "homepageClutter",
-        "removeHomepageClutter",
       );
     },
 
@@ -2101,7 +2075,7 @@
 
   z-index: 2147483001 !important;
 
-  width: 340px !important;
+  width: 312px !important;
   max-width: calc(100vw - 24px) !important;
   max-height: calc(100vh - 96px) !important;
 

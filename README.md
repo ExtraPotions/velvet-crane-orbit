@@ -4,11 +4,11 @@
 
 Remove common Amazon dark patterns while keeping control over the protections you want.
 
-**Version 0.1.38** · By [expDARE](https://github.com/ExtraPotions)
+**Version 0.1.39** · By [expDARE](https://github.com/ExtraPotions)
 
 ## Features
 
-- 13 toggleable protections, grouped into Promotions, Advertising, Amazon services, AI, Convenience and Advanced.
+- 12 toggleable protections, grouped into Promotions, Advertising, Amazon services, AI, Convenience and Advanced.
 - Block Prime upsells, urgency/scarcity prompts and Subscribe & Save nudges.
 - Remove sponsored products, ad shelves, credit-card and protection-plan promotions.
 - Hide Rufus/AI chrome, service promos and Amazon Business nudges.
@@ -17,7 +17,7 @@ Remove common Amazon dark patterns while keeping control over the protections yo
 - Protection master switch to pause or resume cleanup.
 - Display options and per-session blocked-item counts live under Advanced as nested menus.
 - Clear stats sits with session stats; Reset recommended stays at the panel foot.
-- Compact 340px charcoal menu with denser spacing, accessible toggle buttons and descriptions.
+- Compact 312px charcoal menu with denser spacing, accessible toggle buttons and descriptions.
 - High-contrast switches and automatic system reduced-motion support.
 - Remembered launcher placement, including a preferred position beside a page control.
 
