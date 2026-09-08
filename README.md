@@ -4,7 +4,7 @@
 
 Remove common Amazon dark patterns while keeping control over the protections you want.
 
-**Version 0.1.36** · By [expDARE](https://github.com/ExtraPotions)
+**Version 0.1.37** Â· By [expDARE](https://github.com/ExtraPotions)
 
 ## Features
 
@@ -35,4 +35,4 @@ Install Violentmonkey or Tampermonkey, then open the [latest userscript](https:/
 
 ## License
 
-[CC BY-NC 4.0](LICENSE) — Copyright (c) 2025–2026 expDARE. Attribution required; non-commercial use only.
+[CC BY-NC 4.0](LICENSE) â€” Copyright (c) 2025â€“2026 expDARE. Attribution required; non-commercial use only.
