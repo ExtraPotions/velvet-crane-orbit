@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Amazon Dark Pattern Blocker
 // @namespace      https://github.com/ExtraPotions/velvet-crane-orbit
-// @version        0.1.36
+// @version        0.1.37
 // @description    Remove Amazon dark patterns + floating settings; major amazon.* storefronts
 // @author         expDARE
 // @license        CC-BY-NC-4.0
@@ -30,7 +30,7 @@
 // @match          https://amazon.com.mx/*
 // @match          https://www.amazon.nl/*
 // @match          https://amazon.nl/*
-// @icon           https://raw.githubusercontent.com/ExtraPotions/velvet-crane-orbit/v0.1.36/icon-128.png
+// @icon           https://raw.githubusercontent.com/ExtraPotions/velvet-crane-orbit/v0.1.37/icon-128.png
 // @run-at         document-start
 // @downloadURL    https://github.com/ExtraPotions/velvet-crane-orbit/releases/latest/download/amazon-dark-pattern-blocker.user.js
 // @updateURL      https://github.com/ExtraPotions/velvet-crane-orbit/releases/latest/download/amazon-dark-pattern-blocker.user.js
@@ -44,16 +44,16 @@
 
 /*
  * Amazon Dark Pattern Blocker
- * Copyright (c) 2025–2026 expDARE
- * Licensed under CC BY-NC 4.0 — https://creativecommons.org/licenses/by-nc/4.0/
+ * Copyright (c) 2025â€“2026 expDARE
+ * Licensed under CC BY-NC 4.0 â€” https://creativecommons.org/licenses/by-nc/4.0/
  * Forks and modifications must attribute expDARE.
- * Non-commercial use only — no profit from this work.
+ * Non-commercial use only â€” no profit from this work.
  */
 
 (function () {
   "use strict";
 
-  const VERSION = "0.1.36";
+  const VERSION = "0.1.37";
   const PREFIX = "adpb-";
 
   // ============================================================
@@ -1943,7 +1943,7 @@
     STYLE_ID:
       "adpb-settings-rail-style",
 
-    // Existing icon — intentionally unchanged.
+    // Existing icon â€” intentionally unchanged.
     ICON:
       "data:image/png;base64,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",
 
@@ -2906,7 +2906,7 @@
       close.className =
         "adpb-close";
 
-      close.textContent = "×";
+      close.textContent = "Ã—";
 
       close.setAttribute(
         "aria-label",
@@ -3118,7 +3118,7 @@
           "true",
         );
 
-        chevron.textContent = "›";
+        chevron.textContent = "â€º";
 
         heading.appendChild(headingTitle);
         heading.appendChild(headingCount);
@@ -3272,7 +3272,7 @@
               "true",
             );
             chevronNode.textContent =
-              "›";
+              "â€º";
 
             toggle.appendChild(titleNode);
             toggle.appendChild(chevronNode);
@@ -3545,7 +3545,7 @@
         "adpb-foot";
 
       foot.textContent =
-        `Amazon Dark Pattern Blocker ${VERSION} · Drag the button to reposition`;
+        `Amazon Dark Pattern Blocker ${VERSION} Â· Drag the button to reposition`;
 
       panel.appendChild(foot);
 
@@ -4919,7 +4919,7 @@
   function setupMenu() {
     try {
       GM_registerMenuCommand(
-        `${MasterSetting.value ? "✓" : "✗"} Protection`,
+        `${MasterSetting.value ? "âœ“" : "âœ—"} Protection`,
         () => {
           MasterSetting.value =
             !MasterSetting.value;
@@ -4932,7 +4932,7 @@
       Object.entries(Settings).forEach(
         ([key, setting]) => {
           GM_registerMenuCommand(
-            `${setting.value ? "✓" : "✗"} ${setting.displayName}`,
+            `${setting.value ? "âœ“" : "âœ—"} ${setting.displayName}`,
             () => {
               setting.toggle();
 
@@ -4945,7 +4945,7 @@
       );
 
       GM_registerMenuCommand(
-        "↺ Reset recommended settings",
+        "â†º Reset recommended settings",
         () => {
           SettingsRail.resetRecommended();
         },
