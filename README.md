@@ -4,7 +4,7 @@
 
 Remove common Amazon dark patterns while keeping control over the protections you want.
 
-**Version 0.1.39** · By [expDARE](https://github.com/ExtraPotions)
+**Version 0.1.40** · By [expDARE](https://github.com/ExtraPotions)
 
 ## Features
 
