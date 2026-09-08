@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Amazon Dark Pattern Blocker
 // @namespace      https://github.com/ExtraPotions/velvet-crane-orbit
-// @version        0.1.34
+// @version        0.1.35
 // @description    Remove Amazon dark patterns + floating settings; major amazon.* storefronts
 // @author         expDARE
 // @license        CC-BY-NC-4.0
@@ -30,7 +30,7 @@
 // @match          https://amazon.com.mx/*
 // @match          https://www.amazon.nl/*
 // @match          https://amazon.nl/*
-// @icon           https://raw.githubusercontent.com/ExtraPotions/velvet-crane-orbit/v0.1.34/icon-128.png
+// @icon           https://raw.githubusercontent.com/ExtraPotions/velvet-crane-orbit/v0.1.35/icon-128.png
 // @run-at         document-start
 // @downloadURL    https://github.com/ExtraPotions/velvet-crane-orbit/releases/latest/download/amazon-dark-pattern-blocker.user.js
 // @updateURL      https://github.com/ExtraPotions/velvet-crane-orbit/releases/latest/download/amazon-dark-pattern-blocker.user.js
@@ -53,7 +53,7 @@
 (function () {
   "use strict";
 
-  const VERSION = "0.1.34";
+  const VERSION = "0.1.35";
   const PREFIX = "adpb-";
 
   // ============================================================
@@ -2083,7 +2083,7 @@
     0 18px 50px rgba(0,0,0,.48),
     0 3px 12px rgba(0,0,0,.28) !important;
 
-  padding: 18px !important;
+  padding: 12px !important;
 
   font:
     13px/1.4
@@ -2115,13 +2115,13 @@
   align-items: flex-start !important;
   justify-content: space-between !important;
 
-  gap: 12px !important;
+  gap: 10px !important;
 
-  margin-bottom: 14px !important;
+  margin-bottom: 8px !important;
 }
 
 #${this.PANEL_ID} .adpb-title {
-  font-size: 16px !important;
+  font-size: 15px !important;
   line-height: 1.2 !important;
   font-weight: 700 !important;
 
@@ -2131,7 +2131,7 @@
 }
 
 #${this.PANEL_ID} .adpb-subtitle {
-  margin-top: 4px !important;
+  margin-top: 2px !important;
 
   font-size: 11px !important;
   line-height: 1.35 !important;
@@ -2171,10 +2171,10 @@
   align-items: center !important;
   gap: 8px !important;
 
-  padding: 10px 11px !important;
-  margin-bottom: 14px !important;
+  padding: 7px 10px !important;
+  margin-bottom: 8px !important;
 
-  border-radius: 9px !important;
+  border-radius: 8px !important;
 
   background: rgba(50,213,131,.08) !important;
   border: 1px solid rgba(50,213,131,.15) !important;
@@ -2216,13 +2216,13 @@
   align-items: center !important;
   justify-content: space-between !important;
 
-  gap: 12px !important;
+  gap: 10px !important;
 
-  padding: 13px !important;
-  margin-bottom: 14px !important;
+  padding: 9px 11px !important;
+  margin-bottom: 8px !important;
 
   border: 1px solid rgba(255,153,0,.22) !important;
-  border-radius: 11px !important;
+  border-radius: 10px !important;
   background: rgba(255,153,0,.08) !important;
 }
 
@@ -2231,22 +2231,22 @@
 }
 
 #${this.PANEL_ID} .adpb-master-title {
-  font-size: 14px !important;
+  font-size: 13px !important;
   font-weight: 700 !important;
   color: #fff !important;
 }
 
 #${this.PANEL_ID} .adpb-master-description {
-  margin-top: 3px !important;
+  margin-top: 1px !important;
   color: #9299a3 !important;
   font-size: 11px !important;
 }
 
 #${this.PANEL_ID} .adpb-section {
-  margin-top: 10px !important;
+  margin-top: 6px !important;
 
   border: 1px solid rgba(255,255,255,.08) !important;
-  border-radius: 10px !important;
+  border-radius: 8px !important;
   background: rgba(255,255,255,.025) !important;
   overflow: hidden !important;
 }
@@ -2255,8 +2255,8 @@
   display: flex !important;
   align-items: center !important;
   width: 100% !important;
-  min-height: 42px !important;
-  padding: 0 13px !important;
+  min-height: 32px !important;
+  padding: 0 10px !important;
   border: 0 !important;
   background: transparent !important;
   color: #f2f3f5 !important;
@@ -2299,7 +2299,7 @@
 
 #${this.PANEL_ID} .adpb-section-content {
   display: none !important;
-  padding: 0 13px 7px !important;
+  padding: 0 10px 4px !important;
 }
 
 #${this.PANEL_ID} .adpb-section.is-open .adpb-section-content {
@@ -2312,9 +2312,9 @@
 
   width: 100% !important;
 
-  gap: 12px !important;
+  gap: 8px !important;
 
-  padding: 9px 0 !important;
+  padding: 6px 0 !important;
 
   cursor: pointer !important;
 }
@@ -2339,19 +2339,19 @@
 
   color: #f2f3f5 !important;
 
-  font-size: 13px !important;
-  line-height: 1.3 !important;
+  font-size: 12.5px !important;
+  line-height: 1.25 !important;
 }
 
 #${this.PANEL_ID} .adpb-setting-description {
   display: block !important;
 
-  margin-top: 2px !important;
+  margin-top: 1px !important;
 
   color: #828994 !important;
 
-  font-size: 10.5px !important;
-  line-height: 1.35 !important;
+  font-size: 10px !important;
+  line-height: 1.3 !important;
 }
 
 #${this.PANEL_ID} .adpb-switch-input {
@@ -2449,8 +2449,8 @@
 }
 
 #${this.PANEL_ID} .adpb-preferences {
-  margin-top: 14px !important;
-  padding-top: 12px !important;
+  margin-top: 10px !important;
+  padding-top: 8px !important;
   border-top: 1px solid rgba(255,255,255,.08) !important;
 }
 
@@ -2477,8 +2477,8 @@
 
 #${this.PANEL_ID} .adpb-show-more {
   width: 100% !important;
-  min-height: 34px !important;
-  margin: 2px 0 3px !important;
+  min-height: 26px !important;
+  margin: 1px 0 2px !important;
   padding: 0 !important;
   border: 0 !important;
   background: transparent !important;
@@ -2501,9 +2501,9 @@
 }
 
 #${this.PANEL_ID} .adpb-stats {
-  margin-top: 15px !important;
+  margin-top: 10px !important;
 
-  padding: 12px !important;
+  padding: 8px 10px !important;
 
   border-radius: 9px !important;
 
@@ -2516,7 +2516,7 @@
   justify-content: space-between !important;
   align-items: baseline !important;
 
-  margin-bottom: 7px !important;
+  margin-bottom: 4px !important;
 }
 
 #${this.PANEL_ID} .adpb-stats-title {
@@ -2545,15 +2545,15 @@
 
 #${this.PANEL_ID} .adpb-actions {
   display: flex !important;
-  gap: 8px !important;
+  gap: 6px !important;
 
-  margin-top: 14px !important;
+  margin-top: 10px !important;
 }
 
 #${this.PANEL_ID} .adpb-action {
   flex: 1 1 0 !important;
 
-  min-height: 32px !important;
+  min-height: 28px !important;
 
   border-radius: 8px !important;
 
