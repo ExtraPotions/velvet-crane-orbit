@@ -21,6 +21,8 @@ $readmeText = Get-Content -Raw $readmePath
 $scriptText = $scriptText -replace '(?m)^// @version\s+\S+', "// @version        $Version"
 $scriptText = $scriptText -replace 'const VERSION = "[^"]+"', "const VERSION = `"$Version`""
 $readmeText = $readmeText -replace '(releases/tag/v)\d+\.\d+\.\d+', "`${1}$Version"
+$readmeText = $readmeText -replace '\*\*Version \d+\.\d+\.\d+\*\*', "**Version $Version**"
+$scriptText = $scriptText -replace '(velvet-crane-orbit/v)\d+\.\d+\.\d+(/icon-128.png)', "`${1}$Version`${2}"
 
 [IO.File]::WriteAllText($scriptPath, $scriptText)
 [IO.File]::WriteAllText($readmePath, $readmeText)
@@ -32,4 +34,4 @@ git tag -a $tag -m "Release Amazon Dark Pattern Blocker $tag"
 git push origin main
 git push origin $tag
 
-Write-Host "Pushed $tag. GitHub Actions will generate the release and upload assets."
+Write-Host "Pushed $tag. GitHub Actions will test the script and prepare a draft release with assets. Verify it before publishing."

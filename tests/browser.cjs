@@ -1,0 +1,33 @@
+const {chromium}=require('playwright');const fs=require('node:fs');const assert=require('node:assert/strict');
+(async()=>{const browser=await chromium.launch({headless:true});try{
+ for(const csp of [false,true]){
+  const context=await browser.newContext({viewport:{width:1000,height:900}});
+  await context.route('https://www.amazon.com/**',r=>r.fulfill({contentType:'text/html',headers:csp?{'Content-Security-Policy':"style-src 'self'; img-src 'self' data:"}:{},body:'<style>button{padding:50px!important;color:white!important;background:white!important}</style><div id="primeDPUpsellStaticContainerNPA">Prime upsell</div><p>Regular product information</p>'}));
+  await context.addInitScript(()=>{window.GM_getValue=(k,d)=>JSON.parse(localStorage.getItem(k)||JSON.stringify(d));window.GM_setValue=(k,v)=>localStorage.setItem(k,JSON.stringify(v));window.GM_registerMenuCommand=()=>{};});
+  await context.addInitScript({content:fs.readFileSync('amazon-dark-pattern-blocker.user.js','utf8')});
+  const page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));page.on('console',msg=>{if(msg.type()==='error')console.log(msg.text());});
+  await page.goto('https://www.amazon.com/dp/fixture');await page.waitForTimeout(100);assert.deepEqual(errors,[]);const fab=page.getByRole('button',{name:'Dark Pattern Blocker settings',exact:true});await fab.click({timeout:3000});
+  const panel=page.getByRole('dialog');assert.equal(await panel.isVisible(),true);assert.equal((await panel.boundingBox()).width,312);
+  assert.equal(await panel.locator('[type=checkbox]').count(),0);assert.equal(await panel.locator('[role=switch]').count(),15);
+  const master=panel.getByRole('switch',{name:'Protection',exact:true});assert.equal((await master.boundingBox()).width,36);
+  await master.click();assert.equal(await master.getAttribute('aria-checked'),'false');
+  assert.equal(await page.locator('#primeDPUpsellStaticContainerNPA').isVisible(),true);
+  await master.press('Space');assert.equal(await master.getAttribute('aria-checked'),'true');
+  await page.waitForTimeout(350);
+  assert.equal(await page.locator('#primeDPUpsellStaticContainerNPA').isVisible(),false);
+  const saved=await fab.boundingBox();
+  await page.evaluate(()=>{const secondary=document.createElement('button');secondary.dataset.expdareControl='secondary';secondary.id='test-companion';secondary.style.cssText='position:fixed;right:16px;bottom:16px;width:48px;height:48px;padding:0';document.body.append(secondary);const unrelated=secondary.cloneNode();unrelated.removeAttribute('data-expdare-control');unrelated.id='test-unrelated';document.body.append(unrelated);});
+  const unrelatedBefore=await page.locator('#test-unrelated').boundingBox();await page.waitForTimeout(1700);
+  assert.equal((await fab.boundingBox()).y,saved.y);
+  assert((await page.locator('#test-companion').boundingBox()).x<saved.x-48);
+  assert.equal((await page.locator('#test-unrelated').boundingBox()).x,unrelatedBefore.x);
+  await page.emulateMedia({reducedMotion:'reduce',contrast:'more'});await page.waitForTimeout(50);
+  assert.equal(await master.evaluate(el=>getComputedStyle(el).backgroundColor),'rgb(255, 255, 255)');
+  assert.equal(await master.evaluate(el=>getComputedStyle(el,'::after').transitionDuration),'0s');
+  await page.emulateMedia({reducedMotion:'no-preference',contrast:'no-preference'});
+  await page.setViewportSize({width:360,height:640});await page.waitForTimeout(100);const box=await panel.boundingBox();assert(box.x>=0&&box.y>=0&&box.x+box.width<=360&&box.y+box.height<=640);
+  fs.mkdirSync('test-results',{recursive:true});await page.screenshot({path:'test-results/menu-'+csp+'.png'});
+  await page.keyboard.press('Escape');assert.equal(await panel.isVisible(),false);assert.deepEqual(errors,[]);await context.close();
+  console.log('Amazon menu, toggles, primary docking and accessibility passed; CSP='+csp);
+ }
+}finally{await browser.close();}})().catch(e=>{console.error(e);process.exitCode=1;});

@@ -1,0 +1,1 @@
+{"name":"amazon-dark-pattern-blocker","private":true,"scripts":{"test":"node tests/browser.cjs"},"devDependencies":{"playwright":"1.55.0"}}
