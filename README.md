@@ -4,7 +4,7 @@
 
 Remove common Amazon dark patterns while keeping control over the protections you want.
 
-**Version 0.1.40** · By [expDARE](https://github.com/ExtraPotions)
+**Version 0.1.41** · By [expDARE](https://github.com/ExtraPotions)
 
 ## Features
 
@@ -20,6 +20,7 @@ Remove common Amazon dark patterns while keeping control over the protections yo
 - Compact 312px charcoal menu with denser spacing, accessible toggle buttons and descriptions.
 - High-contrast switches and automatic system reduced-motion support.
 - Remembered launcher placement, including a preferred position beside a page control.
+- Versioned settings are validated and migrated automatically when updating.
 
 Supports Amazon storefronts in the US, UK, Canada, Germany, France, Italy, Spain, Japan, Australia, India, Mexico and the Netherlands. Most settings apply immediately.
 

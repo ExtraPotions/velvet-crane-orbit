@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Amazon Dark Pattern Blocker
 // @namespace      https://github.com/ExtraPotions/velvet-crane-orbit
-// @version        0.1.40
+// @version        0.1.41
 // @description    Remove Amazon dark patterns + floating settings; major amazon.* storefronts
 // @author         expDARE
 // @license        CC-BY-NC-4.0
@@ -30,7 +30,7 @@
 // @match          https://amazon.com.mx/*
 // @match          https://www.amazon.nl/*
 // @match          https://amazon.nl/*
-// @icon           https://raw.githubusercontent.com/ExtraPotions/velvet-crane-orbit/v0.1.40/icon-128.png
+// @icon           https://raw.githubusercontent.com/ExtraPotions/velvet-crane-orbit/v0.1.41/icon-128.png
 // @run-at         document-start
 // @downloadURL    https://github.com/ExtraPotions/velvet-crane-orbit/releases/latest/download/amazon-dark-pattern-blocker.user.js
 // @updateURL      https://github.com/ExtraPotions/velvet-crane-orbit/releases/latest/download/amazon-dark-pattern-blocker.user.js
@@ -53,7 +53,7 @@
 (function () {
   "use strict";
 
-  const VERSION = "0.1.40";
+  const VERSION = "0.1.41";
   // ============================================================
   // CONFIGURATION
   // ============================================================
@@ -615,6 +615,29 @@
       } catch (e) {}
     },
   };
+
+  const SETTINGS_SCHEMA = 1;
+  const SETTINGS_SCHEMA_KEY = "adpb-settings-schema";
+  function migrateSettings() {
+    let schema = 0;
+    try { schema = Number(GM_getValue(SETTINGS_SCHEMA_KEY, 0)) || 0; } catch (e) {}
+    if (schema >= SETTINGS_SCHEMA) return;
+    for (const setting of [...Object.values(Settings), ...Object.values(UiSettings)]) {
+      let value;
+      try { value = GM_getValue(setting.name, setting.default); } catch (e) { value = setting.default; }
+      setting.value = typeof value === "boolean" ? value : setting.default;
+    }
+    let enabled = true;
+    try { enabled = GM_getValue("adpb-enabled", true); } catch (e) {}
+    MasterSetting.value = typeof enabled === "boolean" ? enabled : true;
+    try {
+      const top = GM_getValue("adpb-fabTop", null);
+      if (top !== null && (typeof top !== "number" || !Number.isFinite(top))) GM_setValue("adpb-fabTop", null);
+      const target = GM_getValue("adpb-dockTarget", null);
+      if (target !== null && typeof target !== "string") GM_setValue("adpb-dockTarget", null);
+      GM_setValue(SETTINGS_SCHEMA_KEY, SETTINGS_SCHEMA);
+    } catch (e) { debug("Unable to migrate settings", e); }
+  }
 
   // ============================================================
   // SESSION STATS
@@ -4966,6 +4989,7 @@
       `Initializing ${VERSION}`,
     );
 
+    migrateSettings();
     setupMenu();
     SettingsRail.start();
 
