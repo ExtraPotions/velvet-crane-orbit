@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Amazon Dark Pattern Blocker
 // @namespace      https://github.com/ExtraPotions/velvet-crane-orbit
-// @version        0.1.33
+// @version        0.1.34
 // @description    Remove Amazon dark patterns + floating settings; major amazon.* storefronts
 // @author         expDARE
 // @license        CC-BY-NC-4.0
@@ -30,7 +30,7 @@
 // @match          https://amazon.com.mx/*
 // @match          https://www.amazon.nl/*
 // @match          https://amazon.nl/*
-// @icon           https://raw.githubusercontent.com/ExtraPotions/velvet-crane-orbit/main/icon-128.png
+// @icon           https://raw.githubusercontent.com/ExtraPotions/velvet-crane-orbit/v0.1.34/icon-128.png
 // @run-at         document-start
 // @downloadURL    https://github.com/ExtraPotions/velvet-crane-orbit/releases/latest/download/amazon-dark-pattern-blocker.user.js
 // @updateURL      https://github.com/ExtraPotions/velvet-crane-orbit/releases/latest/download/amazon-dark-pattern-blocker.user.js
@@ -53,7 +53,7 @@
 (function () {
   "use strict";
 
-  const VERSION = "0.1.33";
+  const VERSION = "0.1.34";
   const PREFIX = "adpb-";
 
   // ============================================================
@@ -892,7 +892,11 @@
   // EARLY CSS
   // ============================================================
 
+  let hideSheet;
   function injectStyles() {
+    if(!hideSheet)hideSheet=new CSSStyleSheet();
+    hideSheet.replaceSync('');
+    if(!document.adoptedStyleSheets.includes(hideSheet))document.adoptedStyleSheets=[...document.adoptedStyleSheets,hideSheet];
     const existing =
       document.getElementById("adpb-styles");
 
@@ -976,7 +980,7 @@
 
     style.id = "adpb-styles";
 
-    style.textContent =
+    const hideCss =
       `/* Amazon Dark Pattern Blocker ${VERSION} */\n` +
       safeRules.join(",\n") +
       " {\n" +
@@ -988,6 +992,7 @@
       document.documentElement
     ).appendChild(style);
 
+    hideSheet.replaceSync(hideCss);
     debug(
       `Injected ${safeRules.length} early CSS rules`,
     );
@@ -1745,6 +1750,7 @@
   }
 
   function refreshHideStyles() {
+    hideSheet?.replaceSync('');
     const existing =
       document.getElementById(
         "adpb-styles",
@@ -1856,6 +1862,39 @@
   // SETTINGS UI
   // ============================================================
 
+  // DOM-based opt-in works across userscript sandboxes; only expDARE companions yield.
+  function coordinateExpdareControls(anchor, registered = []) {
+    const candidates = new Set([...document.querySelectorAll('[data-expdare-control="secondary"],#pfh-fab,.pfh-fab'), ...registered]);
+    const primary = [anchor];
+    for (const host of document.querySelectorAll('[data-expdare-dock-root]')) {
+      const control = host.shadowRoot?.querySelector('[data-expdare-control="primary"]');
+      if (control && control !== anchor) primary.push(control);
+    }
+    const occupied = primary.map(el=>el.getBoundingClientRect()).filter(r=>r.width&&r.height);
+    const origin=anchor.getBoundingClientRect();
+    const overlaps=r=>occupied.some(o=>r.left<o.right+8&&r.right>o.left-8&&r.top<o.bottom+8&&r.bottom>o.top-8);
+    for (const el of candidates) {
+      if (!el.isConnected || primary.includes(el) || el.dataset.expdareControl==='primary') continue;
+      const ownerRoot=el.getRootNode().host;
+      if(ownerRoot?.dataset.expdareDockRoot==='primary')continue;
+      let rect=el.getBoundingClientRect();
+      if (!rect.width || !rect.height || !['fixed','sticky'].includes(getComputedStyle(el).position)) continue;
+      if(overlaps(rect)){
+        let x=origin.left-rect.width-8,y=origin.top;
+        for(let n=0;n<100;n++){
+          if(x<8){x=Math.max(8,innerWidth-rect.width-16);y-=rect.height+8;}
+          if(y<8)break;
+          const box={left:x,right:x+rect.width,top:y,bottom:y+rect.height};
+          if(!overlaps(box)){
+            for(const [key,value] of Object.entries({left:x+'px',top:y+'px',right:'auto',bottom:'auto'}))el.style.setProperty(key,value,'important');
+            rect=box;break;
+          }
+          x-=rect.width+8;
+        }
+      }
+      occupied.push(rect);
+    }
+  }
   const SettingsRail = {
     BTN_ID:
       "adpb-settings-fab",
@@ -1871,7 +1910,7 @@
 
     // Existing icon — intentionally unchanged.
     ICON:
-      "https://raw.githubusercontent.com/ExtraPotions/velvet-crane-orbit/main/icon-64.png",
+      "data:image/png;base64,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",
 
     panel: null,
     button: null,
@@ -2552,24 +2591,52 @@
 `;
     },
 
+    menuCss() {
+      return `
+        :host{font:13px/1.4 system-ui,sans-serif;color-scheme:dark}
+        #${this.BTN_ID},#${this.PANEL_ID},#${this.LABEL_ID}{pointer-events:auto!important}
+        #${this.BTN_ID}{right:16px!important;border-radius:13px!important;border:1px solid #ffffff33!important;background:#121722!important;box-shadow:0 5px 18px #0006!important}
+        #${this.BTN_ID} img{width:100%!important;height:100%!important}
+        #${this.PANEL_ID}{width:min(312px,calc(100vw - 32px))!important;max-height:calc(100dvh - 24px)!important;padding:0!important;background:#282826!important;color:#ddd!important;font:13px/1.4 system-ui,sans-serif!important;border:1px solid #ffffff22!important;box-shadow:0 16px 40px #0007!important}
+        #${this.PANEL_ID} .adpb-header{padding:14px 18px 10px!important;margin:0!important}
+        #${this.PANEL_ID} .adpb-title{font-size:15px!important;color:#ddd!important}
+        #${this.PANEL_ID} .adpb-subtitle{font-size:12px!important;color:#bbb!important}
+        #${this.PANEL_ID} :is(.adpb-master,.adpb-preferences,.adpb-section,.adpb-stats,.adpb-actions){padding:9px 18px!important;margin:0!important;border:0!important;border-top:1px solid #ffffff14!important;border-radius:0!important;background:transparent!important}
+        #${this.PANEL_ID} .adpb-status{margin:0!important;padding:9px 18px!important;background:transparent!important;border:0!important;border-top:1px solid #ffffff14!important;border-radius:0!important;flex-wrap:wrap!important}
+        #${this.PANEL_ID} :is(.adpb-section-title,.adpb-preferences-title,.adpb-stats-title){font:700 10px/1.4 system-ui,sans-serif!important;letter-spacing:.08em!important;color:#aaa!important;text-transform:uppercase!important}
+        #${this.PANEL_ID} .adpb-setting{display:flex!important;justify-content:space-between!important;align-items:center!important;gap:12px!important;min-height:34px!important;padding:7px 0!important;background:transparent!important}
+        #${this.PANEL_ID} .adpb-setting.is-extra{display:none!important}
+        #${this.PANEL_ID} .show-all .adpb-setting.is-extra{display:flex!important}
+        #${this.PANEL_ID} :is(.adpb-setting-name,.adpb-master-title){font:13px/1.4 system-ui,sans-serif!important;color:#ddd!important}
+        #${this.PANEL_ID} :is(.adpb-setting-description,.adpb-master-description,.adpb-status-detail,.adpb-stat-row,.adpb-foot){color:#bbb!important;font:12px/1.4 system-ui,sans-serif!important}
+        #${this.PANEL_ID} .adpb-toggle{display:none!important}
+        #${this.PANEL_ID} .adpb-switch-input{all:initial!important;box-sizing:border-box!important;position:relative!important;display:block!important;flex:0 0 36px!important;width:36px!important;height:20px!important;padding:0!important;border:1px solid #ffffff33!important;border-radius:999px!important;background:#596171!important;cursor:pointer!important}
+        #${this.PANEL_ID} .adpb-switch-input::after{content:'';position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:#fff;transition:transform .15s}
+        #${this.PANEL_ID} .adpb-switch-input[aria-checked=true]{background:linear-gradient(90deg,#e66aa1,#67cfff,#a185f5)!important}
+        #${this.PANEL_ID} .adpb-switch-input[aria-checked=true]::after{transform:translateX(16px)}
+        #${this.PANEL_ID} :is(.adpb-action,.adpb-show-more,.adpb-close){border:1px solid #ffffff22!important;background:#1c2230!important;color:#ddd!important;border-radius:8px!important;padding:5px 8px!important;font:12px/1.4 system-ui,sans-serif!important}
+        #${this.PANEL_ID} .adpb-section-toggle{background:transparent!important;color:#ddd!important}
+        #${this.PANEL_ID} .adpb-foot{padding:8px 18px 12px!important;margin:0!important;font-size:10px!important}
+        #${this.PANEL_ID} button:focus-visible,#${this.BTN_ID}:focus-visible{outline:2px solid #82dcff!important;outline-offset:3px!important}
+        #${this.PANEL_ID}.adpb-high-contrast{background:#000!important;color:#fff!important;border:2px solid #fff!important}
+        #${this.PANEL_ID}.adpb-high-contrast .adpb-switch-input{border-color:white!important;background:black!important}
+        #${this.PANEL_ID}.adpb-high-contrast .adpb-switch-input[aria-checked=true]{background:white!important}
+        #${this.PANEL_ID}.adpb-high-contrast .adpb-switch-input[aria-checked=true]::after{background:black}
+        @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important}}
+        @media(forced-colors:active){#${this.PANEL_ID} .adpb-switch-input{forced-color-adjust:none!important;border-color:ButtonText!important;background:Canvas!important}#${this.PANEL_ID} .adpb-switch-input::after{background:ButtonText}#${this.PANEL_ID} .adpb-switch-input[aria-checked=true]{background:Highlight!important}#${this.PANEL_ID} .adpb-switch-input[aria-checked=true]::after{background:HighlightText}}
+      `;
+    },
+
     ensureStyle() {
-      let node =
-        document.getElementById(
-          this.STYLE_ID,
-        );
+      const sheet=new CSSStyleSheet();sheet.replaceSync(this.css()+this.menuCss());
+      this.shadow.adoptedStyleSheets=[sheet];
+    },
 
-      if (!node) {
-        node = document.createElement("style");
-        node.id = this.STYLE_ID;
-
-        (
-          document.documentElement ||
-          document.head
-        ).appendChild(node);
-      }
-
-      node.textContent =
-        this.css();
+    makeSwitch(name) {
+      const input=document.createElement('button');input.type='button';input.setAttribute('role','switch');input.setAttribute('aria-label',name);
+      Object.defineProperty(input,'checked',{get(){return this.getAttribute('aria-checked')==='true';},set(value){this.setAttribute('aria-checked',String(Boolean(value)));}});
+      input.addEventListener('click',()=>{input.checked=!input.checked;input.dispatchEvent(new Event('change',{bubbles:true}));});
+      return input;
     },
 
     createSwitch(
@@ -2610,9 +2677,8 @@
       copy.appendChild(description);
 
       const input =
-        document.createElement("input");
+        this.makeSwitch(setting.displayName);
 
-      input.type = "checkbox";
       input.className =
         "adpb-switch-input";
 
@@ -2812,10 +2878,7 @@
       );
 
       const masterInput =
-        document.createElement("input");
-
-      masterInput.type =
-        "checkbox";
+        this.makeSwitch("Protection");
 
       masterInput.className =
         "adpb-switch-input";
@@ -3282,7 +3345,7 @@
         ([key, setting]) => {
           const input =
             this.panel.querySelector(
-              `[data-setting="${key}"] input`,
+              `[data-setting="${key}"] [role="switch"]`,
             );
 
           if (!input) return;
@@ -3400,12 +3463,15 @@
 
       if (open) {
         this.placePanel();
+        this.panel.querySelector('button').focus({preventScroll:true});
+      } else {
+        this.button.focus({preventScroll:true});
       }
     },
 
     updateAppearance() {
       const highContrast =
-        UiSettings.highContrast.value;
+        UiSettings.highContrast.value || matchMedia('(prefers-contrast: more)').matches;
 
       if (this.panel) {
         this.panel.classList.toggle(
@@ -3434,14 +3500,13 @@
         return false;
       }
 
-      if (
-        document.getElementById(
-          this.BTN_ID,
-        )
-      ) {
+      if (this.host?.isConnected) {
         return true;
       }
 
+      this.host=document.createElement('div');this.host.id='adpb-ui-root';this.host.dataset.expdareDockRoot='primary';
+      this.host.style.cssText='all:initial!important;position:fixed!important;inset:0!important;z-index:2147483647!important;pointer-events:none!important';
+      this.shadow=this.host.attachShadow({mode:'open'});
       this.ensureStyle();
 
       const panel =
@@ -3455,6 +3520,8 @@
 
       button.type =
         "button";
+      button.dataset.expdareControl='primary';
+      button.setAttribute('aria-controls',this.PANEL_ID);
 
       button.title =
         "Dark Pattern Blocker settings";
@@ -3770,7 +3837,9 @@
           },
         ];
 
+        const companionRects=[...document.querySelectorAll('[data-expdare-control="secondary"],#pfh-fab,.pfh-fab')].map(el=>el.getBoundingClientRect());
         const fits = (candidate) =>
+          !companionRects.some(r=>candidate.left<r.right+8&&candidate.left+labelRect.width>r.left-8&&candidate.top<r.bottom+8&&candidate.top+labelRect.height>r.top-8) &&
           candidate.left >= 8 &&
           candidate.top >= 8 &&
           candidate.left +
@@ -3781,7 +3850,7 @@
             viewportHeight - 8;
 
         const chosen =
-          candidates.find(fits) || {
+          candidates.map(candidate=>({...candidate,left:Math.max(8,Math.min(viewportWidth-labelRect.width-8,candidate.left))})).find(fits) || {
             left: Math.max(
               8,
               Math.min(
@@ -3817,111 +3886,8 @@
       };
 
       const pushRelatedControls = () => {
-        const buttonRect =
-          button.getBoundingClientRect();
-        const viewportHeight =
-          window.innerHeight || 600;
-        const buttonCenter =
-          buttonRect.top +
-          buttonRect.height / 2;
-
-        const registeredControls = new Set(
-          (ControlRegistry.controls || [])
-            .filter((entry) =>
-              entry &&
-              entry.element &&
-              entry.element.isConnected !== false &&
-              entry.role !== "primary" &&
-              entry.owner === "expDARE",
-            )
-            .map((entry) => entry.element),
-        );
-
-        document
-          .querySelectorAll('[data-adpb-pushed="true"]')
-          .forEach((node) => {
-            node.style.removeProperty("translate");
-            delete node.dataset.adpbPushed;
-          });
-
-        document
-          .querySelectorAll(
-            'button, [role="button"], input[type="button"], input[type="submit"], a[role="button"]',
-          )
-          .forEach((node) => {
-            if (!registeredControls.has(node)) {
-              return;
-            }
-
-            if (
-              node === button ||
-              node === identityLabel ||
-              node.closest(
-                "#adpb-settings-fab, #adpb-settings-panel, #adpb-settings-label",
-              )
-            ) {
-              return;
-            }
-
-            const style = window.getComputedStyle(node);
-
-            if (
-              (style.position !== "fixed" &&
-                style.position !== "sticky")
-            ) {
-              return;
-            }
-
-            const rect =
-              node.getBoundingClientRect();
-
-            const overlaps =
-              rect.right >=
-                buttonRect.left - 8 &&
-              rect.left <=
-                buttonRect.right + 8 &&
-              rect.bottom >
-                buttonRect.top - 8 &&
-              rect.top <
-                buttonRect.bottom + 8;
-
-            if (!overlaps) {
-              if (
-                node.dataset.adpbPushed ===
-                "true"
-              ) {
-                node.style.removeProperty(
-                  "translate",
-                );
-                delete node.dataset.adpbPushed;
-              }
-              return;
-            }
-
-            const awayFromTop =
-              buttonCenter <
-              viewportHeight / 2;
-            const distance =
-              awayFromTop
-                ? buttonRect.bottom -
-                  rect.top +
-                  10
-                : rect.bottom -
-                  buttonRect.top +
-                  10;
-            const delta =
-              awayFromTop
-                ? Math.max(10, distance)
-                : -Math.max(10, distance);
-
-            node.style.setProperty(
-              "translate",
-              `0px ${delta}px`,
-              "important",
-            );
-            node.dataset.adpbPushed =
-              "true";
-          });
+        const registered=(ControlRegistry.controls||[]).filter(entry=>entry.owner==='expDARE'&&entry.role!=='primary').map(entry=>entry.element).filter(Boolean);
+        coordinateExpdareControls(button,registered);
       };
 
       const controlIdentity = (node) => ({
@@ -4164,9 +4130,9 @@
         labelHideTimer = window.setTimeout(
           () => {
             if (
-              document.activeElement ===
+              this.shadow.activeElement ===
                 button ||
-              document.activeElement ===
+              this.shadow.activeElement ===
                 identityLabel
             ) {
               return;
@@ -4516,7 +4482,7 @@
           }
 
           const target =
-            event.target;
+            event.composedPath()[0];
 
           if (
             target === button ||
@@ -4564,17 +4530,28 @@
         },
       );
 
-      document.body.appendChild(
+      this.shadow.appendChild(
         panel,
       );
 
-      document.body.appendChild(
+      this.shadow.appendChild(
         button,
       );
 
-      document.body.appendChild(
+      this.shadow.appendChild(
         identityLabel,
       );
+      document.body.appendChild(this.host);
+      panel.addEventListener('keydown',event=>{
+        if(event.key!=='Tab')return;
+        const items=[...panel.querySelectorAll('button,select,summary')].filter(el=>el.getClientRects().length&&!el.disabled);
+        const first=items[0],last=items.at(-1);
+        if(event.shiftKey&&this.shadow.activeElement===first){event.preventDefault();last.focus();}
+        else if(!event.shiftKey&&this.shadow.activeElement===last){event.preventDefault();first.focus();}
+      });
+      panel.addEventListener('click',()=>this.placePanel());
+      matchMedia('(prefers-contrast: more)').addEventListener('change',()=>this.updateAppearance());
+      pushRelatedControls();
 
       this.updateAppearance();
 
@@ -4800,7 +4777,8 @@
   // EARLY CSS + STARTUP
   // ============================================================
 
-  try {
+  function boot() {
+   try {
     injectStyles();
   } catch (error) {
     console.error(
@@ -4816,5 +4794,8 @@
       "[Amazon Dark Pattern Blocker] Initialization failed:",
       error,
     );
+   }
   }
+  if(document.documentElement)boot();
+  else document.addEventListener('DOMContentLoaded',boot,{once:true});
 })();
