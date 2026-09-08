@@ -8,6 +8,9 @@ const {chromium}=require('playwright');const fs=require('node:fs');const assert=
   const page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));page.on('console',msg=>{if(msg.type()==='error')console.log(msg.text());});
   await page.goto('https://www.amazon.com/dp/fixture');await page.waitForTimeout(100);assert.deepEqual(errors,[]);const fab=page.getByRole('button',{name:'Dark Pattern Blocker settings',exact:true});const fabBox=await fab.boundingBox(),iconBox=await fab.locator('img').boundingBox();assert(iconBox.x>=fabBox.x&&iconBox.y>=fabBox.y&&iconBox.x+iconBox.width<=fabBox.x+fabBox.width&&iconBox.y+iconBox.height<=fabBox.y+fabBox.height);assert.equal(iconBox.width,26);assert.equal(iconBox.height,26);await fab.click({timeout:3000});
   const panel=page.getByRole('dialog');assert.equal(await panel.isVisible(),true);assert.equal((await panel.boundingBox()).width,312);
+  assert.equal(await panel.getByRole('button',{name:'Close settings'}).textContent(),'×');
+  assert.equal(await panel.locator('.adpb-section-chevron').first().textContent(),'›');
+  assert.equal(await panel.locator('.adpb-submenu-chevron').first().textContent(),'›');
   assert.equal(await panel.locator('[type=checkbox]').count(),0);assert.equal(await panel.locator('[role=switch]').count(),15);
   const master=panel.getByRole('switch',{name:'Protection',exact:true});assert.equal((await master.boundingBox()).width,36);
   await master.click();assert.equal(await master.getAttribute('aria-checked'),'false');
