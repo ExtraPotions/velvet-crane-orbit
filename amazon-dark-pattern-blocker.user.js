@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Amazon Dark Pattern Blocker
 // @namespace      https://github.com/ExtraPotions/velvet-crane-orbit
-// @version        0.1.35
+// @version        0.1.36
 // @description    Remove Amazon dark patterns + floating settings; major amazon.* storefronts
 // @author         expDARE
 // @license        CC-BY-NC-4.0
@@ -30,7 +30,7 @@
 // @match          https://amazon.com.mx/*
 // @match          https://www.amazon.nl/*
 // @match          https://amazon.nl/*
-// @icon           https://raw.githubusercontent.com/ExtraPotions/velvet-crane-orbit/v0.1.35/icon-128.png
+// @icon           https://raw.githubusercontent.com/ExtraPotions/velvet-crane-orbit/v0.1.36/icon-128.png
 // @run-at         document-start
 // @downloadURL    https://github.com/ExtraPotions/velvet-crane-orbit/releases/latest/download/amazon-dark-pattern-blocker.user.js
 // @updateURL      https://github.com/ExtraPotions/velvet-crane-orbit/releases/latest/download/amazon-dark-pattern-blocker.user.js
@@ -53,7 +53,7 @@
 (function () {
   "use strict";
 
-  const VERSION = "0.1.35";
+  const VERSION = "0.1.36";
   const PREFIX = "adpb-";
 
   // ============================================================
@@ -2302,8 +2302,95 @@
   padding: 0 10px 4px !important;
 }
 
+
 #${this.PANEL_ID} .adpb-section.is-open .adpb-section-content {
   display: block !important;
+}
+
+#${this.PANEL_ID} .adpb-submenu {
+  margin-top: 6px !important;
+  border: 1px solid rgba(255,255,255,.08) !important;
+  border-radius: 8px !important;
+  background: rgba(255,255,255,.03) !important;
+  overflow: hidden !important;
+}
+
+#${this.PANEL_ID} .adpb-submenu-toggle {
+  display: flex !important;
+  align-items: center !important;
+  width: 100% !important;
+  min-height: 28px !important;
+  padding: 0 8px !important;
+  border: 0 !important;
+  background: transparent !important;
+  color: #e8eaed !important;
+  cursor: pointer !important;
+  font: inherit !important;
+  text-align: left !important;
+}
+
+#${this.PANEL_ID} .adpb-submenu-toggle:hover {
+  background: rgba(255,255,255,.045) !important;
+}
+
+#${this.PANEL_ID} .adpb-submenu-toggle:focus-visible {
+  outline: 2px solid rgba(255,153,0,.75) !important;
+  outline-offset: -2px !important;
+}
+
+#${this.PANEL_ID} .adpb-submenu-title {
+  flex: 1 1 auto !important;
+  font-size: 11px !important;
+  font-weight: 650 !important;
+}
+
+#${this.PANEL_ID} .adpb-submenu-chevron {
+  color: #9ca3af !important;
+  font-size: 14px !important;
+  transition: transform .15s ease !important;
+}
+
+#${this.PANEL_ID} .adpb-submenu.is-open .adpb-submenu-chevron {
+  transform: rotate(90deg) !important;
+}
+
+#${this.PANEL_ID} .adpb-submenu-content {
+  display: none !important;
+  padding: 0 8px 6px !important;
+}
+
+#${this.PANEL_ID} .adpb-submenu.is-open .adpb-submenu-content {
+  display: block !important;
+}
+
+#${this.PANEL_ID} .adpb-submenu .adpb-stats {
+  margin-top: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+}
+
+#${this.PANEL_ID} .adpb-submenu .adpb-stats-heading {
+  margin-bottom: 4px !important;
+}
+
+#${this.PANEL_ID} .adpb-submenu .adpb-clear-stats {
+  width: 100% !important;
+  min-height: 26px !important;
+  margin-top: 6px !important;
+  padding: 0 8px !important;
+  border: 1px solid rgba(255,255,255,.10) !important;
+  border-radius: 8px !important;
+  background: rgba(255,255,255,.04) !important;
+  color: #d9dde2 !important;
+  cursor: pointer !important;
+  font: inherit !important;
+  font-size: 11px !important;
+}
+
+#${this.PANEL_ID} .adpb-submenu .adpb-clear-stats:hover {
+  background: rgba(255,255,255,.08) !important;
+  color: #fff !important;
 }
 
 #${this.PANEL_ID} .adpb-setting {
@@ -2449,18 +2536,13 @@
 }
 
 #${this.PANEL_ID} .adpb-preferences {
-  margin-top: 10px !important;
-  padding-top: 8px !important;
-  border-top: 1px solid rgba(255,255,255,.08) !important;
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+  border-top: 0 !important;
 }
 
 #${this.PANEL_ID} .adpb-preferences-title {
-  margin-bottom: 4px !important;
-  color: #8e96a0 !important;
-  font-size: 10px !important;
-  font-weight: 700 !important;
-  letter-spacing: .08em !important;
-  text-transform: uppercase !important;
+  display: none !important;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -2501,9 +2583,9 @@
 }
 
 #${this.PANEL_ID} .adpb-stats {
-  margin-top: 10px !important;
+  margin-top: 0 !important;
 
-  padding: 8px 10px !important;
+  padding: 0 !important;
 
   border-radius: 9px !important;
 
@@ -2936,40 +3018,6 @@
 
       panel.appendChild(master);
 
-      const preferences =
-        document.createElement("section");
-
-      preferences.className =
-        "adpb-preferences";
-
-      const preferencesTitle =
-        document.createElement("div");
-
-      preferencesTitle.className =
-        "adpb-preferences-title";
-
-      preferencesTitle.textContent =
-        "Display";
-
-      preferences.appendChild(
-        preferencesTitle,
-      );
-
-      const contrastSwitch =
-        this.createSwitch(
-          UiSettings.highContrast,
-          () => this.updateAppearance(),
-        );
-
-      contrastSwitch.label.dataset.setting =
-        "highContrast";
-
-      preferences.appendChild(
-        contrastSwitch.label,
-      );
-
-      panel.appendChild(preferences);
-
       for (const category of SETTING_CATEGORIES) {
         const section =
           document.createElement("section");
@@ -3016,8 +3064,13 @@
         headingCount.className =
           "adpb-section-count";
 
+        const nestedMenuCount =
+          category.id === "advanced" ? 2 : 0;
+
         headingCount.textContent =
-          String(categorySettings.length);
+          String(
+            categorySettings.length + nestedMenuCount,
+          );
 
         const chevron =
           document.createElement("span");
@@ -3051,13 +3104,13 @@
               );
 
             panel
-              .querySelectorAll(".adpb-section")
+              .querySelectorAll(":scope > .adpb-section")
               .forEach((item) => {
                 item.classList.remove("is-open");
 
                 const toggle =
                   item.querySelector(
-                    ".adpb-section-toggle",
+                    ":scope > .adpb-section-toggle",
                   );
 
                 if (toggle) {
@@ -3145,100 +3198,279 @@
           content.appendChild(showMore);
         }
 
-        if (categorySettings.length > 0) {
+        if (category.id === "advanced") {
+          const makeSubmenu = (
+            title,
+          ) => {
+            const submenu =
+              document.createElement("div");
+
+            submenu.className =
+              "adpb-submenu";
+
+            const toggle =
+              document.createElement("button");
+
+            toggle.type = "button";
+            toggle.className =
+              "adpb-submenu-toggle";
+            toggle.setAttribute(
+              "aria-expanded",
+              "false",
+            );
+
+            const titleNode =
+              document.createElement("span");
+
+            titleNode.className =
+              "adpb-submenu-title";
+            titleNode.textContent =
+              title;
+
+            const chevronNode =
+              document.createElement("span");
+
+            chevronNode.className =
+              "adpb-submenu-chevron";
+            chevronNode.setAttribute(
+              "aria-hidden",
+              "true",
+            );
+            chevronNode.textContent =
+              "›";
+
+            toggle.appendChild(titleNode);
+            toggle.appendChild(chevronNode);
+
+            const body =
+              document.createElement("div");
+
+            body.className =
+              "adpb-submenu-content";
+
+            toggle.addEventListener(
+              "click",
+              (event) => {
+                event.stopPropagation();
+
+                const open =
+                  !submenu.classList.contains(
+                    "is-open",
+                  );
+
+                content
+                  .querySelectorAll(".adpb-submenu")
+                  .forEach((item) => {
+                    item.classList.remove("is-open");
+
+                    const itemToggle =
+                      item.querySelector(
+                        ".adpb-submenu-toggle",
+                      );
+
+                    if (itemToggle) {
+                      itemToggle.setAttribute(
+                        "aria-expanded",
+                        "false",
+                      );
+                    }
+                  });
+
+                if (open) {
+                  submenu.classList.add("is-open");
+                  toggle.setAttribute(
+                    "aria-expanded",
+                    "true",
+                  );
+                }
+              },
+            );
+
+            submenu.appendChild(toggle);
+            submenu.appendChild(body);
+
+            return {
+              root: submenu,
+              body,
+            };
+          };
+
+          const displayMenu =
+            makeSubmenu("Display");
+
+          const preferences =
+            document.createElement("div");
+
+          preferences.className =
+            "adpb-preferences";
+
+          const preferencesTitle =
+            document.createElement("div");
+
+          preferencesTitle.className =
+            "adpb-preferences-title";
+
+          preferencesTitle.textContent =
+            "Display";
+
+          preferences.appendChild(
+            preferencesTitle,
+          );
+
+          const contrastSwitch =
+            this.createSwitch(
+              UiSettings.highContrast,
+              () => this.updateAppearance(),
+            );
+
+          contrastSwitch.label.dataset.setting =
+            "highContrast";
+
+          preferences.appendChild(
+            contrastSwitch.label,
+          );
+
+          displayMenu.body.appendChild(
+            preferences,
+          );
+
+          content.appendChild(
+            displayMenu.root,
+          );
+
+          const statsMenu =
+            makeSubmenu(
+              "Blocked this session",
+            );
+
+          const stats =
+            document.createElement("div");
+
+          stats.className =
+            "adpb-stats";
+
+          const statsHeading =
+            document.createElement("div");
+
+          statsHeading.className =
+            "adpb-stats-heading";
+
+          const statsTitle =
+            document.createElement("span");
+
+          statsTitle.className =
+            "adpb-stats-title";
+
+          statsTitle.textContent =
+            "Total";
+
+          const statsTotal =
+            document.createElement("span");
+
+          statsTotal.className =
+            "adpb-stats-total";
+
+          statsHeading.appendChild(
+            statsTitle,
+          );
+
+          statsHeading.appendChild(
+            statsTotal,
+          );
+
+          stats.appendChild(
+            statsHeading,
+          );
+
+          const statRows = {};
+
+          const statLabels = {
+            promotions: "Promotions",
+            advertising: "Advertising",
+            services: "Services",
+            ai: "Amazon AI",
+            convenience: "Convenience",
+            advanced: "Advanced",
+          };
+
+          Object.entries(
+            statLabels,
+          ).forEach(([key, label]) => {
+            const row =
+              document.createElement("div");
+
+            row.className =
+              "adpb-stat-row";
+
+            const labelNode =
+              document.createElement("span");
+
+            labelNode.textContent =
+              label;
+
+            const valueNode =
+              document.createElement("span");
+
+            valueNode.className =
+              "adpb-stat-value";
+
+            valueNode.textContent =
+              "0";
+
+            row.appendChild(labelNode);
+            row.appendChild(valueNode);
+
+            stats.appendChild(row);
+
+            statRows[key] =
+              valueNode;
+          });
+
+          this.statsNode = {
+            total: statsTotal,
+            rows: statRows,
+          };
+
+          statsMenu.body.appendChild(
+            stats,
+          );
+
+          const clearStatsButton =
+            document.createElement("button");
+
+          clearStatsButton.type =
+            "button";
+
+          clearStatsButton.className =
+            "adpb-clear-stats";
+
+          clearStatsButton.textContent =
+            "Clear stats";
+
+          clearStatsButton.addEventListener(
+            "click",
+            (event) => {
+              event.stopPropagation();
+              Stats.reset();
+            },
+          );
+
+          statsMenu.body.appendChild(
+            clearStatsButton,
+          );
+
+          content.appendChild(
+            statsMenu.root,
+          );
+        }
+
+        if (
+          categorySettings.length > 0 ||
+          category.id === "advanced"
+        ) {
           panel.appendChild(section);
         }
       }
-
-      const stats =
-        document.createElement("div");
-
-      stats.className =
-        "adpb-stats";
-
-      const statsHeading =
-        document.createElement("div");
-
-      statsHeading.className =
-        "adpb-stats-heading";
-
-      const statsTitle =
-        document.createElement("span");
-
-      statsTitle.className =
-        "adpb-stats-title";
-
-      statsTitle.textContent =
-        "Blocked this session";
-
-      const statsTotal =
-        document.createElement("span");
-
-      statsTotal.className =
-        "adpb-stats-total";
-
-      statsHeading.appendChild(
-        statsTitle,
-      );
-
-      statsHeading.appendChild(
-        statsTotal,
-      );
-
-      stats.appendChild(
-        statsHeading,
-      );
-
-      const statRows = {};
-
-      const statLabels = {
-        promotions: "Promotions",
-        advertising: "Advertising",
-        services: "Services",
-        ai: "Amazon AI",
-        convenience: "Convenience",
-        advanced: "Advanced",
-      };
-
-      Object.entries(
-        statLabels,
-      ).forEach(([key, label]) => {
-        const row =
-          document.createElement("div");
-
-        row.className =
-          "adpb-stat-row";
-
-        const labelNode =
-          document.createElement("span");
-
-        labelNode.textContent =
-          label;
-
-        const valueNode =
-          document.createElement("span");
-
-        valueNode.className =
-          "adpb-stat-value";
-
-        valueNode.textContent =
-          "0";
-
-        row.appendChild(labelNode);
-        row.appendChild(valueNode);
-
-        stats.appendChild(row);
-
-        statRows[key] =
-          valueNode;
-      });
-
-      this.statsNode = {
-        total: statsTotal,
-        rows: statRows,
-      };
-
-      panel.appendChild(stats);
 
       const actions =
         document.createElement("div");
@@ -3265,31 +3497,8 @@
         },
       );
 
-      const clearStatsButton =
-        document.createElement("button");
-
-      clearStatsButton.type =
-        "button";
-
-      clearStatsButton.className =
-        "adpb-action";
-
-      clearStatsButton.textContent =
-        "Clear stats";
-
-      clearStatsButton.addEventListener(
-        "click",
-        () => {
-          Stats.reset();
-        },
-      );
-
       actions.appendChild(
         resetButton,
-      );
-
-      actions.appendChild(
-        clearStatsButton,
       );
 
       panel.appendChild(actions);
