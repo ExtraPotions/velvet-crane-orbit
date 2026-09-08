@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Amazon Dark Pattern Blocker
 // @namespace      https://github.com/ExtraPotions/velvet-crane-orbit
-// @version        0.1.43
+// @version        0.1.44
 // @description    Remove Amazon dark patterns + floating settings; major amazon.* storefronts
 // @author         expDARE
 // @license        CC-BY-NC-4.0
@@ -30,7 +30,7 @@
 // @match          https://amazon.com.mx/*
 // @match          https://www.amazon.nl/*
 // @match          https://amazon.nl/*
-// @icon           https://raw.githubusercontent.com/ExtraPotions/velvet-crane-orbit/v0.1.43/icon-128.png
+// @icon           https://raw.githubusercontent.com/ExtraPotions/velvet-crane-orbit/v0.1.44/icon-128.png
 // @run-at         document-start
 // @downloadURL    https://github.com/ExtraPotions/velvet-crane-orbit/releases/latest/download/amazon-dark-pattern-blocker.user.js
 // @updateURL      https://github.com/ExtraPotions/velvet-crane-orbit/releases/latest/download/amazon-dark-pattern-blocker.user.js
@@ -53,7 +53,7 @@
 (function () {
   "use strict";
 
-  const VERSION = "0.1.43";
+  const VERSION = "0.1.44";
   // ============================================================
   // CONFIGURATION
   // ============================================================
@@ -1937,10 +1937,16 @@
     }
   }
   const LAUNCHER_PROTOCOL='userscript-launcher-v1';
+  const SHORTCUT_KEY='adpb-open-shortcut';
+  function normaliseShortcut(value){if(typeof value!=='string')return '';const raw=value.trim();if(!raw||/^off$/i.test(raw))return '';const parts=raw.split('+').map(v=>v.trim()).filter(Boolean),key=parts.pop();if(!key)return '';const mods=['Ctrl','Alt','Shift','Meta'].filter(mod=>parts.some(v=>v.toLowerCase()===mod.toLowerCase()));return [...mods,key.length===1?key.toUpperCase():key].join('+');}
+  function readShortcut(){try{return normaliseShortcut(GM_getValue(SHORTCUT_KEY,''));}catch{return '';}}
+  function writeShortcut(value){const shortcut=normaliseShortcut(value);try{GM_setValue(SHORTCUT_KEY,shortcut);}catch{}return shortcut;}
+  function eventShortcut(event){return [...(event.ctrlKey?['Ctrl']:[]),...(event.altKey?['Alt']:[]),...(event.shiftKey?['Shift']:[]),...(event.metaKey?['Meta']:[]),event.key.length===1?event.key.toUpperCase():event.key].join('+');}
+  function editableTarget(target){return target?.matches?.('input,textarea,select,[contenteditable="true"]');}
   function declareLauncher(node,controls,meta){
     node.dataset.userscriptLauncher=LAUNCHER_PROTOCOL;node.dataset.launcherOwner=meta.owner;node.dataset.launcherId=meta.id;node.dataset.launcherPriority=String(meta.priority);node.dataset.launcherPreferredPosition=meta.preferredPosition;
     let frame=0;const publish=()=>{frame=0;const rects=controls().filter(el=>el?.isConnected&&el.getClientRects().length).map(el=>el.getBoundingClientRect());if(!rects.length)return;const area={left:Math.round(Math.min(...rects.map(r=>r.left))),top:Math.round(Math.min(...rects.map(r=>r.top))),right:Math.round(Math.max(...rects.map(r=>r.right))),bottom:Math.round(Math.max(...rects.map(r=>r.bottom)))};node.dataset.launcherOccupiedArea=JSON.stringify(area);window.dispatchEvent(new CustomEvent('userscript-launcher:change',{detail:{protocol:LAUNCHER_PROTOCOL,owner:meta.owner,id:meta.id,priority:meta.priority,preferredPosition:meta.preferredPosition,occupiedArea:area}}));};
-    const schedule=()=>{if(!frame)frame=requestAnimationFrame(publish);};if(typeof ResizeObserver!=='undefined'){const observer=new ResizeObserver(schedule);for(const el of controls().filter(Boolean))observer.observe(el);}window.addEventListener('resize',schedule,{passive:true});return{publish:schedule};
+    const schedule=()=>{if(!frame)frame=requestAnimationFrame(publish);};if(typeof ResizeObserver!=='undefined'){const observer=new ResizeObserver(schedule);for(const el of controls().filter(Boolean))observer.observe(el);}window.addEventListener('resize',schedule,{passive:true});const checkCollision=()=>{let own=[];try{own=JSON.parse(node.dataset.launcherShortcuts||'[]');}catch{}const collision=[...document.querySelectorAll('[data-userscript-launcher="userscript-launcher-v1"]')].some(el=>{if(el===node)return false;try{return JSON.parse(el.dataset.launcherShortcuts||'[]').some(value=>own.includes(value));}catch{return false;}});node.dataset.launcherShortcutCollision=String(collision);};window.addEventListener('userscript-launcher:change',checkCollision);queueMicrotask(checkCollision);return{publish:schedule};
   }
   const SettingsRail = {
     BTN_ID:
@@ -2593,6 +2599,17 @@
   display: none !important;
 }
 
+#${this.PANEL_ID} .adpb-preferences input[type="text"] {
+  width: 100% !important;
+  min-height: 30px !important;
+  margin-top: 6px !important;
+  padding: 5px 8px !important;
+  border: 1px solid rgba(255,255,255,.22) !important;
+  border-radius: 7px !important;
+  background: #171c27 !important;
+  color: #fff !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   #${this.BTN_ID},
   #${this.PANEL_ID},
@@ -3113,7 +3130,7 @@
           "adpb-section-count";
 
         const nestedMenuCount =
-          category.id === "advanced" ? 3 : 0;
+          category.id === "advanced" ? 4 : 0;
 
         headingCount.textContent =
           String(
@@ -3385,6 +3402,25 @@
           content.appendChild(
             displayMenu.root,
           );
+
+          const shortcutMenu = makeSubmenu("Keyboard shortcut");
+          const shortcutLabel = document.createElement("label");
+          shortcutLabel.className = "adpb-preferences";
+          shortcutLabel.textContent = "Open menu shortcut";
+          const shortcutInput = document.createElement("input");
+          shortcutInput.type = "text";
+          shortcutInput.placeholder = "Off";
+          shortcutInput.setAttribute("aria-label", "Open menu shortcut");
+          shortcutInput.value = readShortcut();
+          shortcutInput.addEventListener("change", () => {
+            shortcutInput.value = writeShortcut(shortcutInput.value);
+            if (this.host) this.host.dataset.launcherShortcuts = JSON.stringify(shortcutInput.value ? [shortcutInput.value] : []);
+            const collision = [...document.querySelectorAll('[data-userscript-launcher="userscript-launcher-v1"]')].some((el) => { if (el === this.host) return false; try { return JSON.parse(el.dataset.launcherShortcuts || '[]').includes(shortcutInput.value); } catch { return false; } });
+            if(this.statusNode?.detail)this.statusNode.detail.textContent=collision ? "Shortcut is also used by another installed script." : "Shortcut saved.";
+          });
+          shortcutLabel.appendChild(shortcutInput);
+          shortcutMenu.body.appendChild(shortcutLabel);
+          content.appendChild(shortcutMenu.root);
 
           const statsMenu =
             makeSubmenu(
@@ -3803,6 +3839,8 @@
       button.dataset.expdareControl='primary';
       button.setAttribute('aria-controls',this.PANEL_ID);
       this.launcherDeclaration=declareLauncher(this.host,()=>[button,panel],{owner:'expDARE',id:'amazon-dark-pattern-blocker',priority:100,preferredPosition:'right-bottom'});
+      this.host.dataset.launcherShortcuts=JSON.stringify(readShortcut()?[readShortcut()]:[]);
+      if(!this.shortcutBound){this.shortcutBound=true;document.addEventListener('keydown',(event)=>{const shortcut=readShortcut();if(shortcut&&!editableTarget(event.target)&&eventShortcut(event)===shortcut){event.preventDefault();this.toggle();}});}
 
       button.title =
         "Dark Pattern Blocker settings";
