@@ -16,7 +16,7 @@ Remove common Amazon dark patterns while keeping control over the protections yo
 - Optional coupon auto-clipping and compact search results.
 - Protection master switch to pause or resume cleanup.
 - Per-session blocked-item counts, Clear stats and Reset recommended.
-- Compact 312px charcoal menu with accessible toggle buttons and descriptions.
+- Compact 340px charcoal menu with denser spacing, accessible toggle buttons and descriptions.
 - High-contrast switches and automatic system reduced-motion support.
 - Remembered launcher placement, including a preferred position beside a page control.
 
