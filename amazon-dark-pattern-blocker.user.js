@@ -1023,6 +1023,32 @@
   // ============================================================
 
   const Declutterer = {
+    restoreCategory(categoryKey) {
+      const selectors =
+        CONFIG.selectors[categoryKey];
+
+      if (!selectors) return 0;
+
+      let count = 0;
+
+      for (const [name, selector] of Object.entries(
+        selectors,
+      )) {
+        if (name === "setting" || !selector) {
+          continue;
+        }
+
+        safeQueryAll(selector).forEach((el) => {
+          if (el.dataset.adpbHidden === "true") {
+            restoreElement(el);
+            count++;
+          }
+        });
+      }
+
+      return count;
+    },
+
     removeByCategory(categoryKey, settingKey) {
       if (!MasterSetting.value) return 0;
 
@@ -1030,7 +1056,7 @@
         !Settings[settingKey] ||
         !Settings[settingKey].value
       ) {
-        return 0;
+        return this.restoreCategory(categoryKey);
       }
 
       const selectors =
@@ -1069,8 +1095,16 @@
       return count;
     },
 
-    clickByCategory(categoryKey) {
+    clickByCategory(categoryKey, settingKey) {
       if (!MasterSetting.value) return 0;
+
+      if (
+        settingKey &&
+        (!Settings[settingKey] ||
+          !Settings[settingKey].value)
+      ) {
+        return 0;
+      }
 
       const targets =
         CONFIG.clickTargets[categoryKey];
@@ -1364,6 +1398,7 @@
     processPrimeModals() {
       return this.clickByCategory(
         "primeModals",
+        "removePrimeUpsells",
       );
     },
 
@@ -1787,14 +1822,14 @@
 
   function applySettingsLive() {
     refreshHideStyles();
+    Actions.restoreHiddenElements();
 
     if (!MasterSetting.value) {
-      Actions.restoreHiddenElements();
       SettingsRail.updateStatus();
       return;
     }
 
-    scheduleProcess(0);
+    processPage();
 
     try {
       Declutterer.processFbtCarousels();
@@ -2678,7 +2713,7 @@
         :host{font:13px/1.4 system-ui,sans-serif;color-scheme:dark}
         #${this.BTN_ID},#${this.PANEL_ID},#${this.LABEL_ID}{pointer-events:auto!important}
         #${this.BTN_ID}{right:16px!important;border-radius:13px!important;border:1px solid #ffffff33!important;background:#121722!important;box-shadow:0 5px 18px #0006!important}
-        #${this.BTN_ID} img{width:100%!important;height:100%!important}
+        #${this.BTN_ID} img{display:block!important;width:26px!important;height:26px!important;max-width:26px!important;max-height:26px!important;object-fit:contain!important;pointer-events:none!important}
         #${this.PANEL_ID}{width:min(312px,calc(100vw - 32px))!important;max-height:calc(100dvh - 24px)!important;padding:0!important;background:#282826!important;color:#ddd!important;font:13px/1.4 system-ui,sans-serif!important;border:1px solid #ffffff22!important;box-shadow:0 16px 40px #0007!important}
         #${this.PANEL_ID} .adpb-header{padding:14px 18px 10px!important;margin:0!important}
         #${this.PANEL_ID} .adpb-title{font-size:15px!important;color:#ddd!important}
