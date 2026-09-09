@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Amazon Dark Pattern Blocker
 // @namespace      https://github.com/ExtraPotions/velvet-crane-orbit
-// @version        0.1.44
+// @version        0.1.45
 // @description    Remove Amazon dark patterns + floating settings; major amazon.* storefronts
 // @author         expDARE
 // @license        CC-BY-NC-4.0
@@ -30,7 +30,7 @@
 // @match          https://amazon.com.mx/*
 // @match          https://www.amazon.nl/*
 // @match          https://amazon.nl/*
-// @icon           https://raw.githubusercontent.com/ExtraPotions/velvet-crane-orbit/v0.1.44/icon-128.png
+// @icon           https://raw.githubusercontent.com/ExtraPotions/velvet-crane-orbit/v0.1.45/icon-128.png
 // @run-at         document-start
 // @downloadURL    https://github.com/ExtraPotions/velvet-crane-orbit/releases/latest/download/amazon-dark-pattern-blocker.user.js
 // @updateURL      https://github.com/ExtraPotions/velvet-crane-orbit/releases/latest/download/amazon-dark-pattern-blocker.user.js
@@ -53,7 +53,7 @@
 (function () {
   "use strict";
 
-  const VERSION = "0.1.44";
+  const VERSION = "0.1.45";
   // ============================================================
   // CONFIGURATION
   // ============================================================
@@ -1943,6 +1943,7 @@
   function writeShortcut(value){const shortcut=normaliseShortcut(value);try{GM_setValue(SHORTCUT_KEY,shortcut);}catch{}return shortcut;}
   function eventShortcut(event){return [...(event.ctrlKey?['Ctrl']:[]),...(event.altKey?['Alt']:[]),...(event.shiftKey?['Shift']:[]),...(event.metaKey?['Meta']:[]),event.key.length===1?event.key.toUpperCase():event.key].join('+');}
   function editableTarget(target){return target?.matches?.('input,textarea,select,[contenteditable="true"]');}
+  function shortcutBlocked(node,shortcut){const priority=Number(node?.dataset.launcherPriority||0),id=node?.dataset.launcherId||'';return [...document.querySelectorAll('[data-userscript-launcher="userscript-launcher-v1"]')].some(el=>{if(el===node)return false;let shortcuts=[];try{shortcuts=JSON.parse(el.dataset.launcherShortcuts||'[]');}catch{}const other=Number(el.dataset.launcherPriority||0);return shortcuts.includes(shortcut)&&(other>priority||(other===priority&&(el.dataset.launcherId||'').localeCompare(id)<0));});}
   function declareLauncher(node,controls,meta){
     node.dataset.userscriptLauncher=LAUNCHER_PROTOCOL;node.dataset.launcherOwner=meta.owner;node.dataset.launcherId=meta.id;node.dataset.launcherPriority=String(meta.priority);node.dataset.launcherPreferredPosition=meta.preferredPosition;
     let frame=0;const publish=()=>{frame=0;const rects=controls().filter(el=>el?.isConnected&&el.getClientRects().length).map(el=>el.getBoundingClientRect());if(!rects.length)return;const area={left:Math.round(Math.min(...rects.map(r=>r.left))),top:Math.round(Math.min(...rects.map(r=>r.top))),right:Math.round(Math.max(...rects.map(r=>r.right))),bottom:Math.round(Math.max(...rects.map(r=>r.bottom)))};node.dataset.launcherOccupiedArea=JSON.stringify(area);window.dispatchEvent(new CustomEvent('userscript-launcher:change',{detail:{protocol:LAUNCHER_PROTOCOL,owner:meta.owner,id:meta.id,priority:meta.priority,preferredPosition:meta.preferredPosition,occupiedArea:area}}));};
@@ -3419,6 +3420,7 @@
             if(this.statusNode?.detail)this.statusNode.detail.textContent=collision ? "Shortcut is also used by another installed script." : "Shortcut saved.";
           });
           shortcutLabel.appendChild(shortcutInput);
+          const disableShortcut = document.createElement("button");disableShortcut.type="button";disableShortcut.className="adpb-clear-stats";disableShortcut.textContent="Disable shortcut";disableShortcut.addEventListener("click",()=>{shortcutInput.value=writeShortcut("");if(this.host)this.host.dataset.launcherShortcuts="[]";if(this.statusNode?.detail)this.statusNode.detail.textContent="Keyboard shortcut disabled.";});shortcutLabel.appendChild(disableShortcut);
           shortcutMenu.body.appendChild(shortcutLabel);
           content.appendChild(shortcutMenu.root);
 
@@ -3840,7 +3842,7 @@
       button.setAttribute('aria-controls',this.PANEL_ID);
       this.launcherDeclaration=declareLauncher(this.host,()=>[button,panel],{owner:'expDARE',id:'amazon-dark-pattern-blocker',priority:100,preferredPosition:'right-bottom'});
       this.host.dataset.launcherShortcuts=JSON.stringify(readShortcut()?[readShortcut()]:[]);
-      if(!this.shortcutBound){this.shortcutBound=true;document.addEventListener('keydown',(event)=>{const shortcut=readShortcut();if(shortcut&&!editableTarget(event.target)&&eventShortcut(event)===shortcut){event.preventDefault();this.toggle();}});}
+      if(!this.shortcutBound){this.shortcutBound=true;document.addEventListener('keydown',(event)=>{const shortcut=readShortcut();if(shortcut&&!editableTarget(event.target)&&eventShortcut(event)===shortcut&&!shortcutBlocked(this.host,shortcut)){event.preventDefault();this.toggle();}});}
 
       button.title =
         "Dark Pattern Blocker settings";
