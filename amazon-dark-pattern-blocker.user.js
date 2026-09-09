@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Amazon Dark Pattern Blocker
 // @namespace      https://github.com/ExtraPotions/velvet-crane-orbit
-// @version        0.1.45
+// @version        0.1.46
 // @description    Remove Amazon dark patterns + floating settings; major amazon.* storefronts
 // @author         expDARE
 // @license        CC-BY-NC-4.0
@@ -30,7 +30,7 @@
 // @match          https://amazon.com.mx/*
 // @match          https://www.amazon.nl/*
 // @match          https://amazon.nl/*
-// @icon           https://raw.githubusercontent.com/ExtraPotions/velvet-crane-orbit/v0.1.45/icon-128.png
+// @icon           https://raw.githubusercontent.com/ExtraPotions/velvet-crane-orbit/v0.1.46/icon-128.png
 // @run-at         document-start
 // @downloadURL    https://github.com/ExtraPotions/velvet-crane-orbit/releases/latest/download/amazon-dark-pattern-blocker.user.js
 // @updateURL      https://github.com/ExtraPotions/velvet-crane-orbit/releases/latest/download/amazon-dark-pattern-blocker.user.js
@@ -53,7 +53,7 @@
 (function () {
   "use strict";
 
-  const VERSION = "0.1.45";
+  const VERSION = "0.1.46";
   // ============================================================
   // CONFIGURATION
   // ============================================================
@@ -491,6 +491,14 @@
       {
         displayName: "High contrast switches",
         description: "Use stronger borders and clearer switch states.",
+        default: false,
+      },
+    ),
+    updateNotifications: new Setting(
+      "adpb-update-notifications",
+      {
+        displayName: "Quiet update notifications",
+        description: "Check release metadata once a day and show a quiet indicator.",
         default: false,
       },
     ),
@@ -3396,6 +3404,19 @@
             contrastSwitch.label,
           );
 
+          const updateSwitch =
+            this.createSwitch(
+              UiSettings.updateNotifications,
+              () => this.checkForUpdate(),
+            );
+
+          updateSwitch.label.dataset.setting =
+            "updateNotifications";
+
+          preferences.appendChild(
+            updateSwitch.label,
+          );
+
           displayMenu.body.appendChild(
             preferences,
           );
@@ -3811,6 +3832,48 @@
           highContrast,
         );
       }
+    },
+
+    isNewerVersion(latest, current) {
+      const a = String(latest).split(".").map(Number);
+      const b = String(current).split(".").map(Number);
+      if (a.some(Number.isNaN) || b.some(Number.isNaN)) return false;
+      for (let i = 0; i < Math.max(a.length, b.length); i += 1) {
+        const difference = (a[i] || 0) - (b[i] || 0);
+        if (difference) return difference > 0;
+      }
+      return false;
+    },
+
+    async checkForUpdate() {
+      if (!this.host || !this.button) return;
+      if (!UiSettings.updateNotifications.value) {
+        this.host.removeAttribute("data-update-available");
+        this.button.title = "Dark Pattern Blocker settings";
+        return;
+      }
+      const key = "adpb-update-check";
+      const show = (latest) => {
+        this.host.removeAttribute("data-update-available");
+        this.button.title = "Dark Pattern Blocker settings";
+        if (!this.isNewerVersion(latest, VERSION)) return;
+        this.host.dataset.updateAvailable = latest;
+        this.button.title = `Dark Pattern Blocker ${latest} is available`;
+        if (this.statusNode) this.statusNode.textContent = `Update available: ${latest}`;
+      };
+      try {
+        const cached = JSON.parse(localStorage.getItem(key) || "null");
+        if (cached && Date.now() - cached.checked < 86400000) {
+          show(cached.latest);
+          return;
+        }
+        const response = await fetch("https://api.github.com/repos/ExtraPotions/velvet-crane-orbit/releases/latest", { headers: { Accept: "application/vnd.github+json" } });
+        if (!response.ok) return;
+        const data = await response.json();
+        const latest = String(data.tag_name || "").replace(/^v/, "");
+        localStorage.setItem(key, JSON.stringify({ checked: Date.now(), latest }));
+        show(latest);
+      } catch (_err) {}
     },
 
     mount() {
@@ -4875,6 +4938,7 @@
       pushRelatedControls();
 
       this.updateAppearance();
+      this.checkForUpdate();
 
       this.updateStatus();
       this.updateStats();

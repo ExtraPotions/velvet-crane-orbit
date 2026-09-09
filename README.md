@@ -4,7 +4,7 @@
 
 Remove common Amazon dark patterns while keeping control over the protections you want.
 
-**Version 0.1.45** · By [expDARE](https://github.com/ExtraPotions)
+**Version 0.1.46** · By [expDARE](https://github.com/ExtraPotions)
 
 ## Features
 
@@ -16,6 +16,7 @@ Remove common Amazon dark patterns while keeping control over the protections yo
 - Optional coupon auto-clipping and compact search results.
 - Protection master switch to pause or resume cleanup.
 - Display options and per-session blocked-item counts live under Advanced as nested menus.
+- Optional quiet update checks use release metadata only and never download executable code.
 - Clear stats sits with session stats; Reset recommended stays at the panel foot.
 - Compact 312px charcoal menu with denser spacing, accessible toggle buttons and descriptions.
 - High-contrast switches and automatic system reduced-motion support.

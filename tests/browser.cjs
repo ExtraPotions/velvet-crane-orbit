@@ -1,7 +1,8 @@
 const {chromium}=require('playwright');const fs=require('node:fs');const assert=require('node:assert/strict');
 (async()=>{const browser=await chromium.launch({headless:true});try{
  for(const csp of [false,true]){
-  const context=await browser.newContext({viewport:{width:1000,height:900}});
+  const context=await browser.newContext({viewport:{width:1000,height:900}});let updateRequests=0;
+  await context.route('https://api.github.com/repos/ExtraPotions/velvet-crane-orbit/releases/latest',r=>{updateRequests+=1;r.fulfill({contentType:'application/json',body:JSON.stringify({tag_name:'v99.0.0'})});});
   await context.route('https://www.amazon.com/**',r=>r.fulfill({contentType:'text/html',headers:csp?{'Content-Security-Policy':"style-src 'self'; img-src 'self' data:"}:{},body:'<style>button{padding:50px!important;color:white!important;background:white!important}</style><div id="primeDPUpsellStaticContainerNPA">Prime upsell</div><p>Regular product information</p>'}));
   await context.addInitScript(()=>{window.GM_getValue=(k,d)=>JSON.parse(localStorage.getItem(k)||JSON.stringify(d));window.GM_setValue=(k,v)=>localStorage.setItem(k,JSON.stringify(v));window.GM_registerMenuCommand=()=>{};});
   await context.addInitScript({content:fs.readFileSync('amazon-dark-pattern-blocker.user.js','utf8')});
@@ -12,8 +13,8 @@ const {chromium}=require('playwright');const fs=require('node:fs');const assert=
   assert.equal(await panel.getByRole('button',{name:'Close settings'}).textContent(),'×');
   assert.equal(await panel.locator('.adpb-section-chevron').first().textContent(),'›');
   assert.equal(await panel.locator('.adpb-submenu-chevron').first().textContent(),'›');
-  assert.equal(await panel.locator('[type=checkbox]').count(),0);assert.equal(await panel.locator('[role=switch]').count(),14);
-  await panel.getByRole('button',{name:/^Advanced/}).click();await panel.getByText('About & diagnostics',{exact:true}).click();assert.match(await panel.locator('.adpb-diagnostics').textContent(),/Amazon Dark Pattern Blocker 0\.1\.45[\s\S]*Active protections:/);await panel.getByText('Keyboard shortcut',{exact:true}).click();const shortcutInput=panel.getByRole('textbox',{name:'Open menu shortcut',exact:true});await shortcutInput.fill('Alt+A');await shortcutInput.press('Tab');await page.keyboard.press('Escape');assert.equal(await panel.isVisible(),false);await page.keyboard.press('Alt+a');assert.equal(await panel.isVisible(),true);await panel.getByRole('button',{name:/^Promotions/}).click();
+  assert.equal(await panel.locator('[type=checkbox]').count(),0);assert.equal(await panel.locator('[role=switch]').count(),15);assert.equal(updateRequests,0);
+  await panel.getByRole('button',{name:/^Advanced/}).click();await panel.getByRole('button',{name:'Display',exact:true}).click();const updates=panel.getByRole('switch',{name:'Quiet update notifications',exact:true});await updates.click();await page.waitForFunction(()=>document.getElementById('adpb-ui-root')?.dataset.updateAvailable==='99.0.0');assert.equal(updateRequests,1);await updates.click();await updates.click();await page.waitForTimeout(50);assert.equal(updateRequests,1);await panel.getByText('About & diagnostics',{exact:true}).click();assert.match(await panel.locator('.adpb-diagnostics').textContent(),/Amazon Dark Pattern Blocker 0\.1\.46[\s\S]*Active protections:/);await panel.getByText('Keyboard shortcut',{exact:true}).click();const shortcutInput=panel.getByRole('textbox',{name:'Open menu shortcut',exact:true});await shortcutInput.fill('Alt+A');await shortcutInput.press('Tab');await page.keyboard.press('Escape');assert.equal(await panel.isVisible(),false);await page.keyboard.press('Alt+a');assert.equal(await panel.isVisible(),true);await panel.getByRole('button',{name:/^Promotions/}).click();
   const master=panel.getByRole('switch',{name:'Protection',exact:true});assert.equal((await master.boundingBox()).width,36);
   await master.click();assert.equal(await master.getAttribute('aria-checked'),'false');
   assert.equal(await page.locator('#primeDPUpsellStaticContainerNPA').isVisible(),true);
