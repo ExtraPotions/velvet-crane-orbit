@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.2.0
+
+- Replace stacked category headings with a compact two-row tab bar.
+- Keep one settings panel open, with selected-tab styling and arrow-key navigation.
+- Show all settings directly in categories of six or fewer items; reserve Show more for seven or more.
+- Preserve 280px desktop/mobile menus, touch targets, info buttons, inspection mode and session counters.
+- Refresh menu screenshots and tabbed-layout browser coverage.
+
 ## 1.1.2
 
 - Replace inline setting descriptions with info buttons supporting hover, keyboard focus and mobile tap.

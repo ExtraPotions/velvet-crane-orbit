@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Amazon Dark Pattern Blocker
 // @namespace      https://github.com/ExtraPotions/velvet-crane-orbit
-// @version        1.1.2
+// @version        1.2.0
 // @description    Remove Amazon dark patterns + floating settings; major amazon.* storefronts
 // @author         expDARE
 // @license        CC-BY-NC-4.0
@@ -30,7 +30,7 @@
 // @match          https://amazon.com.mx/*
 // @match          https://www.amazon.nl/*
 // @match          https://amazon.nl/*
-// @icon           https://raw.githubusercontent.com/ExtraPotions/velvet-crane-orbit/v1.1.2/icon-128.png
+// @icon           https://raw.githubusercontent.com/ExtraPotions/velvet-crane-orbit/v1.2.0/icon-128.png
 // @run-at         document-start
 // @downloadURL    https://github.com/ExtraPotions/velvet-crane-orbit/releases/latest/download/amazon-dark-pattern-blocker.user.js
 // @updateURL      https://github.com/ExtraPotions/velvet-crane-orbit/releases/latest/download/amazon-dark-pattern-blocker.user.js
@@ -53,7 +53,7 @@
 (function () {
   "use strict";
 
-  const VERSION = "1.1.2";
+  const VERSION = "1.2.0";
   // ============================================================
   // CONFIGURATION
   // ============================================================
@@ -2815,6 +2815,16 @@
 
     menuVisualCss() {
       return `
+        #${this.PANEL_ID} .adpb-tabs{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:3px!important;margin:4px 0!important;flex-shrink:0!important}
+        #${this.PANEL_ID} .adpb-tab{min-width:0!important;min-height:30px!important;padding:3px 2px!important;background:#2b2b29!important;border:1px solid #74746f!important;border-radius:6px!important;color:#ddd!important;font:700 11px/1.2 Arial,sans-serif!important;cursor:pointer!important}
+        #${this.PANEL_ID} .adpb-tab[aria-selected=true]{background:#35454b!important;border-color:#9acde0!important;color:#fff!important}
+        #${this.PANEL_ID}>.adpb-section>.adpb-section-toggle{display:none!important}
+        #${this.PANEL_ID}>.adpb-section:not(.is-open){display:none!important}
+        #${this.PANEL_ID}>.adpb-section.is-open{margin-top:0!important;padding-top:3px!important}
+        #${this.PANEL_ID}.adpb-sheet .adpb-tab{min-height:40px!important}
+        #${this.PANEL_ID}.adpb-short .adpb-tabs{display:none!important}
+        @media(pointer:coarse){#${this.PANEL_ID} .adpb-tab{min-height:44px!important}}
+
         #${this.PANEL_ID} .adpb-setting-copy{display:flex!important;align-items:center!important;gap:4px!important}
         #${this.PANEL_ID} .adpb-setting-name{flex:0 1 auto!important;min-width:0!important}
         #${this.PANEL_ID} .adpb-setting-description[hidden]{display:none!important}
@@ -2941,7 +2951,7 @@
       const anchor = button.getBoundingClientRect();
       const rect = tip.getBoundingClientRect();
       tip.style.left = Math.max(x + 8, Math.min(anchor.right - rect.width, x + width - rect.width - 8)) + "px";
-      const top = anchor.bottom + rect.height + 6 <= y + height - 8 ? anchor.bottom + 6 : anchor.top - rect.height - 6;
+      const top = anchor.top - rect.height - 6 >= y + 8 ? anchor.top - rect.height - 6 : anchor.bottom + 6;
       tip.style.top = Math.max(y + 8, Math.min(top, y + height - rect.height - 8)) + "px";
     },
 
@@ -3401,7 +3411,7 @@
           result.label.dataset.setting =
             key;
 
-          if (index >= 5) {
+          if (categorySettings.length > 6 && index >= 5) {
             result.label.classList.add(
               "is-extra",
             );
@@ -3412,7 +3422,7 @@
           );
         });
 
-        if (categorySettings.length > 5) {
+        if (categorySettings.length > 6) {
           const showMore =
             document.createElement("button");
 
@@ -3840,6 +3850,49 @@
 
       panel.appendChild(foot);
 
+      const tabs = document.createElement("div");
+      tabs.className = "adpb-tabs";
+      tabs.setAttribute("role", "tablist");
+      tabs.setAttribute("aria-label", "Protection categories");
+      const sections = [...panel.querySelectorAll(":scope > .adpb-section")];
+      const tabNames = {promotions:"Promotions",advertising:"Ads",services:"Services",ai:"AI",convenience:"Convenience",advanced:"Advanced"};
+      const tabButtons = [];
+      const syncTabs = () => sections.forEach((section, index) => {
+        const selected = section.classList.contains("is-open");
+        tabButtons[index].setAttribute("aria-selected", String(selected));
+        tabButtons[index].tabIndex = selected ? 0 : -1;
+      });
+      sections.forEach((section, index) => {
+        const tab = document.createElement("button");
+        tab.type = "button";
+        tab.className = "adpb-tab";
+        tab.textContent = tabNames[section.dataset.category] || section.dataset.category;
+        tab.id = "adpb-tab-" + index;
+        section.id = "adpb-tabpanel-" + index;
+        section.setAttribute("role", "tabpanel");
+        section.setAttribute("aria-labelledby", tab.id);
+        tab.setAttribute("role", "tab");
+        tab.setAttribute("aria-controls", section.id);
+        const oldHeading = section.querySelector(".adpb-section-toggle");
+        oldHeading.addEventListener("click", syncTabs);
+        tab.addEventListener("click", () => {
+          this.hideInfo();
+          if (!section.classList.contains("is-open")) oldHeading.click();
+          syncTabs();
+        });
+        tab.addEventListener("keydown", event => {
+          const step = {ArrowRight:1,ArrowLeft:-1,ArrowDown:3,ArrowUp:-3}[event.key];
+          if (step === undefined && event.key !== "Home" && event.key !== "End") return;
+          event.preventDefault();
+          const next = event.key === "Home" ? 0 : event.key === "End" ? sections.length-1 : (index+step+sections.length)%sections.length;
+          tabButtons[next].click();
+          tabButtons[next].focus();
+        });
+        tabButtons.push(tab);
+        tabs.appendChild(tab);
+      });
+      panel.insertBefore(tabs, sections[0]);
+      syncTabs();
       return panel;
     },
 
