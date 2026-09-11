@@ -15,6 +15,8 @@ if ((git status --porcelain)) {
 
 $scriptPath = Join-Path $repoRoot 'amazon-dark-pattern-blocker.user.js'
 $readmePath = Join-Path $repoRoot 'README.md'
+$packagePath = Join-Path $repoRoot 'package.json'
+$badgePath = Join-Path $repoRoot 'badge.svg'
 $scriptText = Get-Content -Raw $scriptPath
 $readmeText = Get-Content -Raw $readmePath
 
@@ -26,9 +28,14 @@ $scriptText = $scriptText -replace '(velvet-crane-orbit/v)\d+\.\d+\.\d+(/icon-12
 
 [IO.File]::WriteAllText($scriptPath, $scriptText)
 [IO.File]::WriteAllText($readmePath, $readmeText)
+$package = Get-Content -Raw $packagePath | ConvertFrom-Json
+$package.version = $Version
+[IO.File]::WriteAllText($packagePath, ($package | ConvertTo-Json -Depth 10) + "`n")
+$badgeText = (Get-Content -Raw $badgePath) -replace 'v\d+\.\d+\.\d+', "v$Version"
+[IO.File]::WriteAllText($badgePath, $badgeText)
 
 $tag = "v$Version"
-git add amazon-dark-pattern-blocker.user.js README.md
+git add amazon-dark-pattern-blocker.user.js README.md package.json badge.svg
 git commit -m "Release Amazon Dark Pattern Blocker $tag"
 git tag -a $tag -m "Release Amazon Dark Pattern Blocker $tag"
 git push origin main

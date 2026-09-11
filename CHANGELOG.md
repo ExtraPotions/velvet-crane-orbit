@@ -1,0 +1,13 @@
+# Changelog
+
+## 1.1.0
+
+- Add temporary dimmed reveal mode for hidden elements, with full contrast on hover or keyboard focus. Saved protections remain unchanged.
+- Redesign the menu with compact spacing, rounded sections, a descriptive header and live session statistics.
+- Keep the header and navigation visible while the active section scrolls; adapt positioning to available space and use a mobile bottom sheet.
+- Add a category selector for very short viewports and include text inputs in keyboard focus navigation.
+- Replace the icon with the Amazon Reveal design across repository assets, the launcher and userscript metadata; add a matching version badge.
+- Preserve original inline display priorities when restoring hidden elements.
+- Add browser coverage for reveal mode, dynamic content, counters, layout and keyboard navigation.
+
+The shared multi-site core remains planned; this release is the standalone Amazon userscript.

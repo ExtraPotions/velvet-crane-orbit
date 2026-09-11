@@ -4,7 +4,9 @@
 
 Remove common Amazon dark patterns while keeping control over the protections you want.
 
-**Version 1.0.0** · By [expDARE](https://github.com/ExtraPotions)
+[![Amazon ADPB v1.1.0](badge.svg)](https://github.com/ExtraPotions/velvet-crane-orbit/releases/tag/v1.1.0)
+
+**Version 1.1.0** · By [expDARE](https://github.com/ExtraPotions) · [What's new](CHANGELOG.md)
 
 ## Features
 
@@ -19,6 +21,12 @@ Remove common Amazon dark patterns while keeping control over the protections yo
 - Optional quiet update checks use release metadata only and never download executable code.
 - Clear stats sits with session stats; Reset recommended stays at the panel foot.
 - Compact 312px charcoal menu with denser spacing, accessible toggle buttons and descriptions.
+- Compact icon header, rounded category rows and sentence-case labels keep the menu easy to scan.
+- A short header explains the script; the footer shows live session counts for hidden items, ads and promotions.
+- Show hidden items temporarily restores ADPB-hidden elements dimmed; hover or keyboard focus restores full contrast. Hide revealed items reapplies hiding without changing saved protections. Inspection ends on reload and does not undo clicks or other non-visual actions.
+- Adaptive menu placement chooses the roomier side of the launcher and shifts upward as content expands.
+- The title, close button and category navigation remain visible; overflow scrolls inside the expanded section.
+- Small screens use a full-width bottom sheet. Very short viewports use a category selector to leave room for settings.
 - High-contrast switches and automatic system reduced-motion support.
 - Remembered launcher placement, including a preferred position beside a page control.
 - Versioned settings are validated and migrated automatically when updating.
@@ -29,6 +37,8 @@ Remove common Amazon dark patterns while keeping control over the protections yo
 Supports Amazon storefronts in the US, UK, Canada, Germany, France, Italy, Spain, Japan, Australia, India, Mexico and the Netherlands. Most settings apply immediately.
 
 ## Controls and companion plugins
+
+[Desktop menu preview](docs/menu-desktop.png) · [Mobile menu preview](docs/menu-mobile.png)
 
 Click the 48px rounded-square icon to open settings. **Escape** or an outside click closes the menu. Tab stays within the visible controls. Drag the launcher vertically to reposition it. Its identity label adapts to viewport edges and copies the plugin name when clicked.
 

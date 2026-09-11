@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="24" role="img" aria-label="Amazon ADPB: v1.1.0">
+  <title>Amazon ADPB v1.1.0</title>
+  <clipPath id="r"><rect width="200" height="24" rx="5"/></clipPath>
+  <g clip-path="url(#r)"><path fill="#282826" d="M0 0h130v24H0z"/><path fill="#f5ac78" d="M130 0h70v24h-70z"/></g>
+  <g font-family="Arial,sans-serif" font-size="12" text-anchor="middle"><text x="65" y="16" fill="#fff">Amazon ADPB</text><text x="165" y="16" fill="#242423">v1.1.0</text></g>
+</svg>

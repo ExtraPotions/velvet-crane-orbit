@@ -1,1 +1,11 @@
-{"name":"amazon-dark-pattern-blocker","private":true,"scripts":{"test":"node tests/browser.cjs && node tests/upgrade-matrix.cjs"},"devDependencies":{"playwright":"1.55.0"}}
+{
+  "name": "amazon-dark-pattern-blocker",
+  "private": true,
+  "scripts": {
+    "test": "node tests/browser.cjs && node tests/upgrade-matrix.cjs && node tests/menu-layout.cjs"
+  },
+  "devDependencies": {
+    "playwright": "1.55.0"
+  },
+  "version": "1.1.0"
+}
