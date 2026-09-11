@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.1.2
+
+- Replace inline setting descriptions with info buttons supporting hover, keyboard focus and mobile tap.
+- Use compact 26px desktop rows, shorter labels and small info icons beside the text.
+- Cap mobile sheets at 280px, matching desktop, and center them at the bottom.
+- Tighten the header and session footer while keeping a recognizable 36px header icon.
+- Add tests for help popovers, dismissal, viewport bounds and switch isolation.
+
 ## 1.1.1
 
 - Narrow desktop menus to 280px and center mobile sheets with a 360px maximum width.

@@ -24,7 +24,7 @@ const assert = require('node:assert/strict');
     await fab.click();
     const settle = () => page.waitForTimeout(100);
     await settle();
-    assert.equal(await panel.locator('.adpb-subtitle').textContent(), 'Hide Amazon ads, upsells & pressure tactics.');
+    assert.equal(await panel.locator('.adpb-subtitle').textContent(), 'Hide ads, upsells & pressure tactics.');
     assert.equal(await panel.locator('[data-metric=hidden]').textContent(), '2');
     assert.equal(await panel.locator('[data-metric=advertising]').textContent(), '1');
     assert.equal(await panel.locator('[data-metric=promotions]').textContent(), '1');
@@ -100,7 +100,7 @@ const assert = require('node:assert/strict');
       if (viewport.width <= 600) {
         assert.equal(await fab.isVisible(), false, 'launcher cannot cover bottom sheet controls');
         assert.equal(await panel.getAttribute('data-placement'), 'sheet');
-        assert.equal(Math.round(box.width), Math.min(360, viewport.width));
+        assert.equal(Math.round(box.width), Math.min(280, viewport.width));
         assert(Math.abs(box.y + box.height - viewport.height) < 2);
       }
       if (viewport.height < 560) {

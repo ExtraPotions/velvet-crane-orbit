@@ -2,10 +2,10 @@
   "name": "amazon-dark-pattern-blocker",
   "private": true,
   "scripts": {
-    "test": "node tests/browser.cjs && node tests/upgrade-matrix.cjs && node tests/menu-layout.cjs"
+    "test": "node tests/browser.cjs && node tests/upgrade-matrix.cjs && node tests/menu-layout.cjs && node tests/info-buttons.cjs"
   },
   "devDependencies": {
     "playwright": "1.55.0"
   },
-  "version": "1.1.1"
+  "version": "1.1.2"
 }

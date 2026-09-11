@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Amazon Dark Pattern Blocker
 // @namespace      https://github.com/ExtraPotions/velvet-crane-orbit
-// @version        1.1.1
+// @version        1.1.2
 // @description    Remove Amazon dark patterns + floating settings; major amazon.* storefronts
 // @author         expDARE
 // @license        CC-BY-NC-4.0
@@ -30,7 +30,7 @@
 // @match          https://amazon.com.mx/*
 // @match          https://www.amazon.nl/*
 // @match          https://amazon.nl/*
-// @icon           https://raw.githubusercontent.com/ExtraPotions/velvet-crane-orbit/v1.1.1/icon-128.png
+// @icon           https://raw.githubusercontent.com/ExtraPotions/velvet-crane-orbit/v1.1.2/icon-128.png
 // @run-at         document-start
 // @downloadURL    https://github.com/ExtraPotions/velvet-crane-orbit/releases/latest/download/amazon-dark-pattern-blocker.user.js
 // @updateURL      https://github.com/ExtraPotions/velvet-crane-orbit/releases/latest/download/amazon-dark-pattern-blocker.user.js
@@ -53,7 +53,7 @@
 (function () {
   "use strict";
 
-  const VERSION = "1.1.1";
+  const VERSION = "1.1.2";
   // ============================================================
   // CONFIGURATION
   // ============================================================
@@ -1984,6 +1984,10 @@
     statusNode: null,
     statsNode: null,
     footerStats: null,
+    infoButton: null,
+    infoPopover: null,
+    infoPinned: false,
+    descriptionId: 0,
 
     css() {
       return `
@@ -2811,9 +2815,19 @@
 
     menuVisualCss() {
       return `
+        #${this.PANEL_ID} .adpb-setting-copy{display:flex!important;align-items:center!important;gap:4px!important}
+        #${this.PANEL_ID} .adpb-setting-name{flex:0 1 auto!important;min-width:0!important}
+        #${this.PANEL_ID} .adpb-setting-description[hidden]{display:none!important}
+        #${this.PANEL_ID} .adpb-info{position:relative!important;flex:0 0 18px!important;width:18px!important;height:24px!important;padding:0!important;border:0!important;border-radius:4px!important;background:transparent!important;color:#bcbcb4!important;font:700 10px/1 Arial,sans-serif!important;cursor:pointer!important}
+        #${this.PANEL_ID} .adpb-info::before{content:"";position:absolute;left:2px;top:5px;width:14px;height:14px;border:1px solid currentColor;border-radius:50%;box-sizing:border-box}
+        #${this.PANEL_ID} .adpb-info:hover,#${this.PANEL_ID} .adpb-info[aria-expanded=true]{background:#41413b!important;color:#fff!important}
+        #${this.PANEL_ID} .adpb-info-popover{position:fixed!important;z-index:2147483647!important;width:max-content!important;padding:8px 10px!important;border:1px solid #92928a!important;border-radius:7px!important;background:#171715!important;color:#f5f5ee!important;box-shadow:0 4px 16px #0008!important;font:12px/1.45 Arial,sans-serif!important;overflow:auto!important;overflow-wrap:anywhere!important;text-align:left!important}
+        #${this.PANEL_ID} .adpb-info-popover[hidden]{display:none!important}
+        #${this.PANEL_ID}.adpb-high-contrast :is(.adpb-info,.adpb-info-popover){background:#000!important;color:#fff!important;border-color:#fff!important}
+        @media(pointer:coarse){#${this.PANEL_ID} .adpb-info{flex-basis:28px!important;width:28px!important;height:44px!important}#${this.PANEL_ID} .adpb-info::before{left:7px;top:15px}}
         #${this.PANEL_ID}{padding:4px!important;background:#242423!important;border-color:#777773!important;border-radius:16px!important;font:12px/1.4 Arial,sans-serif!important}
-        #${this.PANEL_ID} .adpb-header{gap:5px!important;align-items:center!important;padding:2px 2px 3px!important}
-        #${this.PANEL_ID} .adpb-header-icon{width:32px!important;height:32px!important;flex:0 0 32px!important;object-fit:contain!important;border-radius:8px!important}
+        #${this.PANEL_ID} .adpb-header{gap:5px!important;align-items:center!important;padding:0 2px 2px!important}
+        #${this.PANEL_ID} .adpb-header-icon{width:36px!important;height:36px!important;flex:0 0 36px!important;object-fit:contain!important;border-radius:8px!important}
         #${this.PANEL_ID} .adpb-header-copy{flex:1!important;min-width:0!important}
         #${this.PANEL_ID} .adpb-title{font:700 15px/1.3 Arial,sans-serif!important;color:#f3f3f1!important}
         #${this.PANEL_ID} .adpb-subtitle{font:11px/1.4 Arial,sans-serif!important;margin-top:0!important;color:#c9c9c5!important}
@@ -2829,7 +2843,7 @@
         #${this.PANEL_ID} .adpb-section-count{color:#b9b9b2!important;font-size:10px!important}
         #${this.PANEL_ID} .adpb-section.is-open>.adpb-section-toggle{border-bottom:1px solid #5e5e58!important}
         #${this.PANEL_ID} .adpb-section-content{padding:0 5px 2px!important;scrollbar-color:#b5cbd5 #2b2b29!important}
-        #${this.PANEL_ID} .adpb-setting{gap:5px!important;min-height:32px!important;padding:3px 0!important}
+        #${this.PANEL_ID} .adpb-setting{gap:5px!important;min-height:26px!important;padding:1px 0!important}
         #${this.PANEL_ID} .adpb-setting+.adpb-setting{border-top:1px solid #ffffff18!important}
         #${this.PANEL_ID} .adpb-setting-name{font:12px/1.4 Arial,sans-serif!important;color:#eee!important}
         #${this.PANEL_ID} .adpb-setting-description{font:11px/1.4 Arial,sans-serif!important;color:#c5c5bf!important}
@@ -2859,14 +2873,21 @@
         #${this.PANEL_ID} .adpb-master-copy{flex:1!important;min-width:0!important}
         #${this.PANEL_ID} .adpb-master .adpb-status{display:flex!important;gap:5px!important;padding:0!important;border:0!important}
         #${this.PANEL_ID} .adpb-master .adpb-status-detail{margin-left:auto!important;font-size:11px!important}
-        #${this.PANEL_ID} .adpb-footer-stats{grid-template-columns:auto auto auto!important;justify-content:space-between!important}
+        #${this.PANEL_ID} .adpb-foot,
+        #${this.PANEL_ID}:is(.adpb-sheet,.adpb-short) .adpb-foot{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:4px!important;padding:2px 2px 0!important}
+        #${this.PANEL_ID} .adpb-footer-caption,
+        #${this.PANEL_ID}.adpb-short .adpb-footer-caption{display:block!important;flex-shrink:0!important}
+        #${this.PANEL_ID} .adpb-footer-stats{display:flex!important;align-items:center!important;gap:5px!important;margin:0!important}
+        #${this.PANEL_ID} .adpb-footer-stats>div{white-space:nowrap!important}
+        #${this.PANEL_ID} .adpb-footer-stats>div::before{content:"·";margin-right:5px}
+        #${this.PANEL_ID} .adpb-footer-stat-value{font-size:11px!important;margin-right:2px!important}
         #${this.PANEL_ID} :is(.adpb-action,.adpb-show-more,.adpb-clear-stats){min-height:26px!important;padding:2px 5px!important;margin-top:2px!important}
         #${this.PANEL_ID} .adpb-category-picker{margin:3px 0!important;min-height:28px!important}
         #${this.PANEL_ID}.adpb-sheet .adpb-header{padding-top:14px!important}
         #${this.PANEL_ID}.adpb-sheet .adpb-header::before{top:4px!important}
         #${this.PANEL_ID}.adpb-sheet :is(.adpb-section-toggle,.adpb-submenu-toggle,.adpb-close,.adpb-action,.adpb-clear-stats){min-height:32px!important}
         #${this.PANEL_ID}.adpb-sheet .adpb-close{min-width:32px!important}
-        #${this.PANEL_ID}.adpb-sheet .adpb-setting{min-height:32px!important}
+        #${this.PANEL_ID}.adpb-sheet .adpb-setting{min-height:26px!important}
         @media(pointer:coarse){#${this.PANEL_ID} :is(.adpb-section-toggle,.adpb-submenu-toggle,.adpb-close,.adpb-action,.adpb-clear-stats,.adpb-show-more,.adpb-setting){min-height:44px!important}}
         @media(forced-colors:active){#${this.PANEL_ID} .adpb-switch-input[aria-checked=true]{background:Highlight!important}#${this.PANEL_ID} .adpb-switch-input[aria-checked=true]::after{background:HighlightText!important}}
       `;
@@ -2884,12 +2905,52 @@
       return input;
     },
 
+    hideInfo() {
+      clearTimeout(this.infoHideTimer);
+      if (this.infoButton) this.infoButton.setAttribute("aria-expanded", "false");
+      if (this.infoPopover) this.infoPopover.hidden = true;
+      this.infoButton = null;
+      this.infoPinned = false;
+    },
+
+    showInfo(button, text) {
+      if (this.infoButton !== button) this.hideInfo();
+      if (!this.infoPopover) {
+        this.infoPopover = document.createElement("div");
+        this.infoPopover.className = "adpb-info-popover";
+        this.infoPopover.setAttribute("role", "tooltip");
+        this.infoPopover.addEventListener("pointerenter", () => clearTimeout(this.infoHideTimer));
+        this.infoPopover.addEventListener("pointerleave", () => {
+          if (!this.infoPinned && this.shadow.activeElement !== this.infoButton) this.hideInfo();
+        });
+        this.panel.appendChild(this.infoPopover);
+      }
+      this.infoButton = button;
+      clearTimeout(this.infoHideTimer);
+      this.infoPopover.textContent = text;
+      this.infoPopover.hidden = false;
+      button.setAttribute("aria-expanded", "true");
+      const viewport = window.visualViewport;
+      const x = viewport?.offsetLeft || 0;
+      const y = viewport?.offsetTop || 0;
+      const width = viewport?.width || window.innerWidth;
+      const height = viewport?.height || window.innerHeight;
+      const tip = this.infoPopover;
+      tip.style.maxWidth = Math.min(240, width - 16) + "px";
+      tip.style.maxHeight = Math.max(40, height - 16) + "px";
+      const anchor = button.getBoundingClientRect();
+      const rect = tip.getBoundingClientRect();
+      tip.style.left = Math.max(x + 8, Math.min(anchor.right - rect.width, x + width - rect.width - 8)) + "px";
+      const top = anchor.bottom + rect.height + 6 <= y + height - 8 ? anchor.bottom + 6 : anchor.top - rect.height - 6;
+      tip.style.top = Math.max(y + 8, Math.min(top, y + height - rect.height - 8)) + "px";
+    },
+
     createSwitch(
       setting,
       onChange,
     ) {
       const label =
-        document.createElement("label");
+        document.createElement("div");
 
       label.className =
         "adpb-setting";
@@ -2907,7 +2968,7 @@
         "adpb-setting-name";
 
       name.textContent =
-        setting.displayName;
+        setting.displayName.replace(/^Remove /, "").replace(/^./, letter => letter.toUpperCase());
 
       const description =
         document.createElement("span");
@@ -2917,12 +2978,40 @@
 
       description.textContent =
         setting.description;
+      description.id = `adpb-description-${++this.descriptionId}`;
+      description.hidden = true;
 
       copy.appendChild(name);
       copy.appendChild(description);
 
       const input =
         this.makeSwitch(setting.displayName);
+      input.setAttribute("aria-describedby", description.id);
+      const info = document.createElement("button");
+      info.type = "button";
+      info.className = "adpb-info";
+      info.textContent = "i";
+      info.setAttribute("aria-label", `About ${setting.displayName}`);
+      info.setAttribute("aria-describedby", description.id);
+      info.setAttribute("aria-expanded", "false");
+      info.addEventListener("pointerenter", event => {
+        if (event.pointerType === "mouse") this.showInfo(info, setting.description);
+      });
+      info.addEventListener("pointerleave", () => {
+        if (this.infoButton === info && !this.infoPinned && this.shadow.activeElement !== info) {
+          this.infoHideTimer = setTimeout(() => this.hideInfo(), 180);
+        }
+      });
+      info.addEventListener("focus", () => this.showInfo(info, setting.description));
+      info.addEventListener("blur", () => { if (this.infoButton === info) this.hideInfo(); });
+      info.addEventListener("click", event => {
+        event.stopPropagation();
+        if (this.infoButton === info && this.infoPinned) this.hideInfo();
+        else {
+          this.showInfo(info, setting.description);
+          this.infoPinned = true;
+        }
+      });
 
       input.className =
         "adpb-switch-input";
@@ -2970,6 +3059,7 @@
         },
       );
 
+      copy.appendChild(info);
       label.appendChild(copy);
       label.appendChild(input);
       label.appendChild(toggle);
@@ -3027,7 +3117,7 @@
         "adpb-subtitle";
 
       subtitle.textContent =
-        "Hide Amazon ads, upsells & pressure tactics.";
+        "Hide ads, upsells & pressure tactics.";
 
       titleBlock.appendChild(title);
       titleBlock.appendChild(subtitle);
@@ -3731,12 +3821,12 @@
 
       const footerCaption = document.createElement("div");
       footerCaption.className = "adpb-footer-caption";
-      footerCaption.textContent = "This session";
+      footerCaption.textContent = "Session";
       const footerStats = document.createElement("div");
       footerStats.className = "adpb-footer-stats";
       foot.setAttribute("aria-label", "This session activity");
       this.footerStats = {};
-      for (const [key, label] of [["hidden", "Hidden"], ["advertising", "Ads"], ["promotions", "Promotions"]]) {
+      for (const [key, label] of [["hidden", "hidden"], ["advertising", "ads"], ["promotions", "promos"]]) {
         const metric = document.createElement("div");
         const value = document.createElement("span");
         value.className = "adpb-footer-stat-value";
@@ -3876,6 +3966,7 @@
     },
 
     close() {
+      this.hideInfo();
       if (!this.panel) return;
 
       this.panel.classList.remove(
@@ -4564,7 +4655,7 @@
         const set = (name, value) => panel.style.setProperty(name, value, "important");
         const available = Math.max(0, height - (sheet ? 8 : 24));
         set("max-height", available + "px");
-        set("width", (sheet ? Math.min(360, width) : Math.min(280, width - 24)) + "px");
+        set("width", (sheet ? Math.min(280, width) : Math.min(280, width - 24)) + "px");
         set("max-width", (sheet ? width : width - 24) + "px");
         set("right", "auto");
         set("bottom", "auto");
@@ -5029,6 +5120,7 @@
       );
       document.body.appendChild(this.host);
       panel.addEventListener('keydown',event=>{
+        if(event.key==='Escape' && this.infoButton){event.preventDefault();event.stopPropagation();this.hideInfo();return;}
         if(event.key!=='Tab')return;
         const items=[...panel.querySelectorAll('button,input,select,textarea,summary,a[href]')].filter(el=>el.getClientRects().length&&!el.disabled);
         const first=items[0],last=items.at(-1);
@@ -5044,6 +5136,13 @@
       };
       panel.addEventListener('click', schedulePanelLayout);
       panel.addEventListener('change', schedulePanelLayout);
+      panel.addEventListener('scroll', () => this.hideInfo(), true);
+      document.addEventListener('pointerdown', event => {
+        const path = event.composedPath();
+        if (this.infoButton && !path.includes(this.infoButton) && !path.includes(this.infoPopover)) this.hideInfo();
+      }, true);
+      window.addEventListener('resize', () => this.hideInfo(), {passive:true});
+      window.visualViewport?.addEventListener('resize', () => this.hideInfo(), {passive:true});
       if (typeof ResizeObserver !== 'undefined') {
         const observer = new ResizeObserver(schedulePanelLayout);
         observer.observe(panel);
