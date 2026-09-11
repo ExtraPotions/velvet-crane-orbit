@@ -4,9 +4,9 @@
 
 Remove common Amazon dark patterns while keeping control over the protections you want.
 
-[![Amazon ADPB v1.1.0](badge.svg)](https://github.com/ExtraPotions/velvet-crane-orbit/releases/tag/v1.1.0)
+[![Amazon ADPB v1.1.1](badge.svg)](https://github.com/ExtraPotions/velvet-crane-orbit/releases/tag/v1.1.1)
 
-**Version 1.1.0** · By [expDARE](https://github.com/ExtraPotions) · [What's new](CHANGELOG.md)
+**Version 1.1.1** · By [expDARE](https://github.com/ExtraPotions) · [What's new](CHANGELOG.md)
 
 ## Features
 

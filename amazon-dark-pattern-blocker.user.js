@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Amazon Dark Pattern Blocker
 // @namespace      https://github.com/ExtraPotions/velvet-crane-orbit
-// @version        1.1.0
+// @version        1.1.1
 // @description    Remove Amazon dark patterns + floating settings; major amazon.* storefronts
 // @author         expDARE
 // @license        CC-BY-NC-4.0
@@ -30,7 +30,7 @@
 // @match          https://amazon.com.mx/*
 // @match          https://www.amazon.nl/*
 // @match          https://amazon.nl/*
-// @icon           https://raw.githubusercontent.com/ExtraPotions/velvet-crane-orbit/v1.1.0/icon-128.png
+// @icon           https://raw.githubusercontent.com/ExtraPotions/velvet-crane-orbit/v1.1.1/icon-128.png
 // @run-at         document-start
 // @downloadURL    https://github.com/ExtraPotions/velvet-crane-orbit/releases/latest/download/amazon-dark-pattern-blocker.user.js
 // @updateURL      https://github.com/ExtraPotions/velvet-crane-orbit/releases/latest/download/amazon-dark-pattern-blocker.user.js
@@ -53,7 +53,7 @@
 (function () {
   "use strict";
 
-  const VERSION = "1.1.0";
+  const VERSION = "1.1.1";
   // ============================================================
   // CONFIGURATION
   // ============================================================

@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.1.1
 
 - Narrow desktop menus to 280px and center mobile sheets with a 360px maximum width.
 - Combine protection status and the master switch in one row.
