@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.2.1
+
+- Clarify the userscript manager description and add Amazon, shopping, ad-blocking and dark-patterns tags.
+- Package verified release assets for publication by the project owner.
+
 ## 1.2.0
 
 - Replace stacked category headings with a compact two-row tab bar.
