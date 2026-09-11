@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- Narrow desktop menus to 280px and center mobile sheets with a 360px maximum width.
+- Combine protection status and the master switch in one row.
+- Remove nested Advanced menu borders and padding; keep light separators between groups.
+- Put footer counts beside their labels to reduce height.
+
 ## 1.1.0
 
 - Add temporary dimmed reveal mode for hidden elements, with full contrast on hover or keyboard focus. Saved protections remain unchanged.

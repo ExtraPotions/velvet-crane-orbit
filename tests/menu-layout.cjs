@@ -100,7 +100,7 @@ const assert = require('node:assert/strict');
       if (viewport.width <= 600) {
         assert.equal(await fab.isVisible(), false, 'launcher cannot cover bottom sheet controls');
         assert.equal(await panel.getAttribute('data-placement'), 'sheet');
-        assert.equal(Math.round(box.width), viewport.width);
+        assert.equal(Math.round(box.width), Math.min(360, viewport.width));
         assert(Math.abs(box.y + box.height - viewport.height) < 2);
       }
       if (viewport.height < 560) {

@@ -20,13 +20,14 @@ Remove common Amazon dark patterns while keeping control over the protections yo
 - Display options and per-session blocked-item counts live under Advanced as nested menus.
 - Optional quiet update checks use release metadata only and never download executable code.
 - Clear stats sits with session stats; Reset recommended stays at the panel foot.
-- Compact 312px charcoal menu with denser spacing, accessible toggle buttons and descriptions.
+- Compact 280px charcoal menu with denser spacing, accessible toggle buttons and descriptions.
 - Compact icon header, rounded category rows and sentence-case labels keep the menu easy to scan.
+- Protection status shares one row with its master switch; Advanced submenus use light separators and minimal inset spacing.
 - A short header explains the script; the footer shows live session counts for hidden items, ads and promotions.
 - Show hidden items temporarily restores ADPB-hidden elements dimmed; hover or keyboard focus restores full contrast. Hide revealed items reapplies hiding without changing saved protections. Inspection ends on reload and does not undo clicks or other non-visual actions.
 - Adaptive menu placement chooses the roomier side of the launcher and shifts upward as content expands.
 - The title, close button and category navigation remain visible; overflow scrolls inside the expanded section.
-- Small screens use a full-width bottom sheet. Very short viewports use a category selector to leave room for settings.
+- Small screens use a centered bottom sheet up to 360px wide. Very short viewports use a category selector to leave room for settings.
 - High-contrast switches and automatic system reduced-motion support.
 - Remembered launcher placement, including a preferred position beside a page control.
 - Versioned settings are validated and migrated automatically when updating.

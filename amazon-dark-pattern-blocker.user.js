@@ -2132,7 +2132,7 @@
 
   z-index: 2147483001 !important;
 
-  width: 312px !important;
+  width: 280px !important;
   max-width: calc(100vw - 24px) !important;
   max-height: calc(100vh - 96px) !important;
 
@@ -2757,7 +2757,7 @@
         #${this.BTN_ID},#${this.PANEL_ID},#${this.LABEL_ID}{pointer-events:auto!important}
         #${this.BTN_ID}{right:16px!important;border-radius:13px!important;border:1px solid #ffffff33!important;background:#121722!important;box-shadow:0 5px 18px #0006!important}
         #${this.BTN_ID} img{display:block!important;width:40px!important;height:40px!important;max-width:40px!important;max-height:40px!important;object-fit:contain!important;pointer-events:none!important}
-        #${this.PANEL_ID}{width:min(312px,calc(100vw - 32px))!important;max-height:calc(100dvh - 24px)!important;padding:0!important;background:#282826!important;color:#ddd!important;font:13px/1.4 system-ui,sans-serif!important;border:1px solid #ffffff22!important;box-shadow:0 16px 40px #0007!important}
+        #${this.PANEL_ID}{width:min(280px,calc(100vw - 32px))!important;max-height:calc(100dvh - 24px)!important;padding:0!important;background:#282826!important;color:#ddd!important;font:13px/1.4 system-ui,sans-serif!important;border:1px solid #ffffff22!important;box-shadow:0 16px 40px #0007!important}
         #${this.PANEL_ID} .adpb-header{padding:14px 18px 10px!important;margin:0!important}
         #${this.PANEL_ID} .adpb-title{font-size:15px!important;color:#ddd!important}
         #${this.PANEL_ID} .adpb-subtitle{font-size:12px!important;color:#bbb!important}
@@ -2840,7 +2840,7 @@
         #${this.PANEL_ID} .adpb-foot{padding:2px 2px 0!important;font:10px/1.4 Arial,sans-serif!important;color:#c5c5bf!important}
         #${this.PANEL_ID} .adpb-foot{display:block!important;border-top:1px solid #ffffff22!important;margin-top:3px!important}
         #${this.PANEL_ID} .adpb-footer-stats{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:4px!important;margin-top:1px!important}
-        #${this.PANEL_ID} .adpb-footer-stat-value{display:block!important;font:700 14px/1.3 Arial,sans-serif!important;color:#eee!important;font-variant-numeric:tabular-nums!important}
+        #${this.PANEL_ID} .adpb-footer-stat-value{display:inline!important;margin-right:4px!important;font:700 12px/1.3 Arial,sans-serif!important;color:#eee!important;font-variant-numeric:tabular-nums!important}
         #${this.PANEL_ID}:is(.adpb-sheet,.adpb-short) .adpb-foot{display:block!important}
         #${this.PANEL_ID}:is(.adpb-sheet,.adpb-short) .adpb-subtitle{display:block!important}
         #${this.PANEL_ID}.adpb-short .adpb-footer-caption{display:none!important}
@@ -2851,8 +2851,15 @@
         #${this.PANEL_ID}.adpb-high-contrast :is(.adpb-section,.adpb-master,.adpb-submenu,.adpb-action){background:#000!important;border-color:#fff!important}
         #${this.PANEL_ID}.adpb-high-contrast .adpb-switch-input[aria-checked=true]{background:white!important}
         #${this.PANEL_ID}.adpb-high-contrast .adpb-switch-input[aria-checked=true]::after{background:black!important}
-        #${this.PANEL_ID} .adpb-submenu{margin-top:2px!important}
-        #${this.PANEL_ID} .adpb-submenu-content{padding:0 4px 2px!important}
+        #${this.PANEL_ID} .adpb-submenu{margin-top:0!important;border:0!important;border-radius:0!important}
+        #${this.PANEL_ID} .adpb-submenu+.adpb-submenu{border-top:1px solid #ffffff22!important}
+        #${this.PANEL_ID} .adpb-submenu-toggle{padding:2px 0!important}
+        #${this.PANEL_ID} .adpb-submenu-content{padding:0 0 2px!important}
+        #${this.PANEL_ID} .adpb-submenu :is(.adpb-preferences,.adpb-stats){padding:0!important}
+        #${this.PANEL_ID} .adpb-master-copy{flex:1!important;min-width:0!important}
+        #${this.PANEL_ID} .adpb-master .adpb-status{display:flex!important;gap:5px!important;padding:0!important;border:0!important}
+        #${this.PANEL_ID} .adpb-master .adpb-status-detail{margin-left:auto!important;font-size:11px!important}
+        #${this.PANEL_ID} .adpb-footer-stats{grid-template-columns:auto auto auto!important;justify-content:space-between!important}
         #${this.PANEL_ID} :is(.adpb-action,.adpb-show-more,.adpb-clear-stats){min-height:26px!important;padding:2px 5px!important;margin-top:2px!important}
         #${this.PANEL_ID} .adpb-category-picker{margin:3px 0!important;min-height:28px!important}
         #${this.PANEL_ID}.adpb-sheet .adpb-header{padding-top:14px!important}
@@ -3084,7 +3091,6 @@
         detail: statusDetail,
       };
 
-      panel.appendChild(status);
 
       const master =
         document.createElement("div");
@@ -3098,28 +3104,7 @@
       masterCopy.className =
         "adpb-master-copy";
 
-      const masterTitle =
-        document.createElement("div");
-
-      masterTitle.className =
-        "adpb-master-title";
-
-      masterTitle.textContent =
-        "Protection";
-
-      const masterDescription =
-        document.createElement("div");
-
-      masterDescription.className =
-        "adpb-master-description";
-
-      masterDescription.textContent =
-        "Enable or disable all protections";
-
-      masterCopy.appendChild(masterTitle);
-      masterCopy.appendChild(
-        masterDescription,
-      );
+      masterCopy.appendChild(status);
 
       const masterInput =
         this.makeSwitch("Protection");
@@ -3851,7 +3836,7 @@
 
       this.statusNode.detail.textContent =
         enabled
-          ? `${count}/${total} protections`
+          ? `${count}/${total}`
           : "All protections off";
 
       this.statusNode.container.classList.toggle(
@@ -4579,7 +4564,7 @@
         const set = (name, value) => panel.style.setProperty(name, value, "important");
         const available = Math.max(0, height - (sheet ? 8 : 24));
         set("max-height", available + "px");
-        set("width", (sheet ? width : Math.min(312, width - 24)) + "px");
+        set("width", (sheet ? Math.min(360, width) : Math.min(280, width - 24)) + "px");
         set("max-width", (sheet ? width : width - 24) + "px");
         set("right", "auto");
         set("bottom", "auto");
@@ -4593,7 +4578,7 @@
           Math.max(topEdge + 12, Math.min(
             side === "above" ? br.top - ph - 8 : br.bottom + 8,
             topEdge + height - ph - 12));
-        let x = sheet ? left : left + width - pw - 12;
+        let x = sheet ? left + (width - pw) / 2 : left + width - pw - 12;
         // A growing panel can use the full viewport; leave the launcher reachable.
         if (!sheet && top < br.bottom + 8 && top + ph > br.top - 8) {
           x = Math.max(left + 12, Math.min(x, br.left - pw - 8));
