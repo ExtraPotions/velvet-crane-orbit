@@ -1995,6 +1995,8 @@
   }
   const LAUNCHER_PROTOCOL='userscript-launcher-v1';
   const LAUNCHER_PROTOCOL_VERSION=1;
+  const LauncherBridge=window.ExtraPotionsLauncher||{protocol:LAUNCHER_PROTOCOL,version:LAUNCHER_PROTOCOL_VERSION,participants:new Map(),register(node,meta={}){if(!node)return null;const entry={node,...meta,protocol:this.protocol,version:this.version};this.participants.set(meta.id||node.id||String(this.participants.size),entry);return entry;},announce(detail={}){const payload={protocol:this.protocol,version:this.version,...detail};window.dispatchEvent(new CustomEvent('userscript-launcher:announce',{detail:payload}));return payload;}};
+  window.ExtraPotionsLauncher=LauncherBridge;
   const SHORTCUT_KEY='adpb-open-shortcut';
   function normaliseShortcut(value){if(typeof value!=='string')return '';const raw=value.trim();if(!raw||/^off$/i.test(raw))return '';const parts=raw.split('+').map(v=>v.trim()).filter(Boolean),key=parts.pop();if(!key)return '';const mods=['Ctrl','Alt','Shift','Meta'].filter(mod=>parts.some(v=>v.toLowerCase()===mod.toLowerCase()));return [...mods,key.length===1?key.toUpperCase():key].join('+');}
   function readShortcut(){try{return normaliseShortcut(GM_getValue(SHORTCUT_KEY,''));}catch{return '';}}
@@ -2004,7 +2006,7 @@
   function shortcutBlocked(node,shortcut){const priority=Number(node?.dataset.launcherPriority||0),id=node?.dataset.launcherId||'';return [...document.querySelectorAll('[data-userscript-launcher="userscript-launcher-v1"]')].some(el=>{if(el===node)return false;let shortcuts=[];try{shortcuts=JSON.parse(el.dataset.launcherShortcuts||'[]');}catch{}const other=Number(el.dataset.launcherPriority||0);return shortcuts.includes(shortcut)&&(other>priority||(other===priority&&(el.dataset.launcherId||'').localeCompare(id)<0));});}
   function declareLauncher(node,controls,meta){
     node.dataset.userscriptLauncher=LAUNCHER_PROTOCOL;node.dataset.launcherProtocolVersion=String(LAUNCHER_PROTOCOL_VERSION);node.dataset.launcherOwner=meta.owner;node.dataset.launcherId=meta.id;node.dataset.launcherPriority=String(meta.priority);node.dataset.launcherPreferredPosition=meta.preferredPosition;
-    let frame=0;const publish=()=>{frame=0;const rects=controls().filter(el=>el?.isConnected&&el.getClientRects().length).map(el=>el.getBoundingClientRect());if(!rects.length)return;const area={left:Math.round(Math.min(...rects.map(r=>r.left))),top:Math.round(Math.min(...rects.map(r=>r.top))),right:Math.round(Math.max(...rects.map(r=>r.right))),bottom:Math.round(Math.max(...rects.map(r=>r.bottom)))};node.dataset.launcherOccupiedArea=JSON.stringify(area);const detail={protocol:LAUNCHER_PROTOCOL,version:LAUNCHER_PROTOCOL_VERSION,owner:meta.owner,id:meta.id,priority:meta.priority,preferredPosition:meta.preferredPosition,occupiedArea:area};window.dispatchEvent(new CustomEvent('userscript-launcher:change',{detail}));window.dispatchEvent(new CustomEvent('userscript-launcher:announce',{detail}));};
+    let frame=0;LauncherBridge.register(node,meta);const publish=()=>{frame=0;const rects=controls().filter(el=>el?.isConnected&&el.getClientRects().length).map(el=>el.getBoundingClientRect());if(!rects.length)return;const area={left:Math.round(Math.min(...rects.map(r=>r.left))),top:Math.round(Math.min(...rects.map(r=>r.top))),right:Math.round(Math.max(...rects.map(r=>r.right))),bottom:Math.round(Math.max(...rects.map(r=>r.bottom)))};node.dataset.launcherOccupiedArea=JSON.stringify(area);const detail={protocol:LAUNCHER_PROTOCOL,version:LAUNCHER_PROTOCOL_VERSION,owner:meta.owner,id:meta.id,priority:meta.priority,preferredPosition:meta.preferredPosition,occupiedArea:area};window.dispatchEvent(new CustomEvent('userscript-launcher:change',{detail}));LauncherBridge.announce(detail);};
     const schedule=()=>{if(!frame)frame=requestAnimationFrame(publish);};if(typeof ResizeObserver!=='undefined'){const observer=new ResizeObserver(schedule);for(const el of controls().filter(Boolean))observer.observe(el);}window.addEventListener('resize',schedule,{passive:true});const checkCollision=()=>{let own=[];try{own=JSON.parse(node.dataset.launcherShortcuts||'[]');}catch{}const collision=[...document.querySelectorAll('[data-userscript-launcher="userscript-launcher-v1"]')].some(el=>{if(el===node)return false;try{return JSON.parse(el.dataset.launcherShortcuts||'[]').some(value=>own.includes(value));}catch{return false;}});node.dataset.launcherShortcutCollision=String(collision);};window.addEventListener('userscript-launcher:change',checkCollision);queueMicrotask(checkCollision);return{publish:schedule};
   }
   const SettingsRail = {
@@ -5589,8 +5591,8 @@
    // The shared runtime is optional. When installed separately, ADPB registers
    // as a plugin and shares launcher/theme state; without it ADPB remains fully
    // functional as a standalone userscript.
-   if (window.ExpDareCore && typeof window.ExpDareCore.registerPlugin === "function") {
-    window.ExpDareCore.registerPlugin("amazon-dark-pattern-blocker", {version: VERSION, site: SITE_KEY});
+   if (window.DPBCore && typeof window.DPBCore.registerPlugin === "function") {
+    window.DPBCore.registerPlugin("amazon-dark-pattern-blocker", {version: VERSION, site: SITE_KEY, core: "DPB Core"});
    }
    try {
     injectStyles();
