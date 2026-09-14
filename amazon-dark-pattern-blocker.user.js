@@ -58,6 +58,9 @@
   "use strict";
 
   const VERSION = "1.2.1";
+  const CORE_SCHEMA = 2;
+  const SITE_KEY = "amazon";
+  const CORE_KEY = `adpb:${SITE_KEY}:`;
   // ============================================================
   // CONFIGURATION
   // ============================================================
@@ -463,7 +466,8 @@
 
     get value() {
       try {
-        return !!GM_getValue(this.name, this.default);
+        const namespaced = GM_getValue(CORE_KEY + this.name, null);
+        return !!(namespaced === null ? GM_getValue(this.name, this.default) : namespaced);
       } catch (e) {
         return this.default;
       }
@@ -471,7 +475,7 @@
 
     set value(value) {
       try {
-        GM_setValue(this.name, !!value);
+        GM_setValue(CORE_KEY + this.name, !!value);
       } catch (e) {
         debug("Unable to save setting", this.name, e);
       }
@@ -506,6 +510,35 @@
         default: false,
       },
     ),
+  };
+
+  const Core = {
+    schemaVersion: CORE_SCHEMA,
+    site: SITE_KEY,
+    settings() { return {...Object.fromEntries(Object.entries(Settings).map(([key, setting]) => [key, setting.value])), ...Object.fromEntries(Object.entries(UiSettings).map(([key, setting]) => [key, setting.value]))}; },
+    writeSettings(values) {
+      const all = {...Settings, ...UiSettings};
+      for (const [key, value] of Object.entries(values || {})) if (all[key] && typeof value === "boolean") all[key].value = value;
+    },
+    exportSettings() { return JSON.stringify({adpb: true, schemaVersion: CORE_SCHEMA, site: SITE_KEY, settings: this.settings()}, null, 2); },
+    importSettings(raw) {
+      const data = typeof raw === "string" ? JSON.parse(raw) : raw;
+      if (!data || data.adpb !== true || !Number.isInteger(Number(data.schemaVersion)) || Number(data.schemaVersion) > CORE_SCHEMA || !data.settings || Array.isArray(data.settings)) throw new Error("Invalid ADPB settings");
+      this.writeSettings(data.settings);
+    },
+    reset(keys) { this.writeSettings(Object.fromEntries(keys.map(key => [key, {...Settings, ...UiSettings}[key]?.default]))); },
+    coverage() {
+      const rows = [];
+      for (const [group, config] of Object.entries(CONFIG.selectors)) for (const [name, selector] of Object.entries(config)) if (name !== "setting") rows.push({group, name, selector, matches: document.querySelectorAll(selector).length});
+      return rows;
+    },
+    externalTheme() {
+      const host = document.getElementById("colorshift-root");
+      const source = host ? getComputedStyle(host) : getComputedStyle(document.documentElement);
+      const values = {};
+      for (const key of ["--menu-bg", "--menu-surface", "--menu-control", "--menu-text", "--menu-muted", "--menu-border", "--menu-accent", "--accent"]) { const value = source.getPropertyValue(key).trim(); if (value) values[key] = value; }
+      return values;
+    },
   };
 
   // Small opt-in coordination surface for ExtraPotions overlays. Other
@@ -637,7 +670,9 @@
     for (const setting of [...Object.values(Settings), ...Object.values(UiSettings)]) {
       let value;
       try { value = GM_getValue(setting.name, setting.default); } catch (e) { value = setting.default; }
-      setting.value = typeof value === "boolean" ? value : setting.default;
+      const migrated = typeof value === "boolean" ? value : setting.default;
+      setting.value = migrated;
+      try { GM_setValue(setting.name, migrated); } catch (e) {}
     }
     let enabled = true;
     try { enabled = GM_getValue("adpb-enabled", true); } catch (e) {}
@@ -1748,7 +1783,7 @@
   const diagnosticErrors = [];
   function diagnosticsText() {
     const active = Object.values(Settings).filter((setting) => setting.value).length;
-    return [`Amazon Dark Pattern Blocker ${VERSION}`, `Site: ${location.hostname}`, `Page: ${getPageType()} (${location.pathname || "/"})`, `Active protections: ${active}/${Object.keys(Settings).length}`, `Blocked this session: ${Stats.total}`, `Last processed: ${lastProcessedAt ? new Date(lastProcessedAt).toISOString() : "Not yet"}`, `Errors: ${diagnosticErrors.length}${diagnosticErrors.length ? " · " + diagnosticErrors.at(-1) : ""}`].join("\n");
+    return [`Amazon Dark Pattern Blocker ${VERSION}`, `Site: ${location.hostname}`, `Page: ${getPageType()} (${location.pathname || "/"})`, `Active protections: ${active}/${Object.keys(Settings).length}`, `Blocked this session: ${Stats.total}`, `Theme source: ${document.getElementById("adpb-ui-root")?.dataset.themeSource || "default"}`, `Companion controls: ${(ControlRegistry.controls || []).filter(entry => entry.role !== "primary" && entry.element?.isConnected).length}`, `Last processed: ${lastProcessedAt ? new Date(lastProcessedAt).toISOString() : "Not yet"}`, `Errors: ${diagnosticErrors.length}${diagnosticErrors.length ? " · " + diagnosticErrors.at(-1) : ""}`].join("\n");
   }
 
   function processPage() {
@@ -2813,6 +2848,12 @@
 
     menuVisualCss() {
       return `
+        #${this.PANEL_ID}{background:var(--menu-bg,#282826)!important;color:var(--menu-text,#ddd)!important}
+        #${this.PANEL_ID} :is(.adpb-status,.adpb-section,.adpb-master,.adpb-preferences,.adpb-stats,.adpb-actions){border-color:var(--menu-border,#ffffff22)!important}
+        #${this.PANEL_ID} .adpb-tab[aria-selected=true]{background:var(--menu-control,#35454b)!important;border-color:var(--menu-accent,#9acde0)!important}
+        #${this.PANEL_ID} .adpb-switch-input[aria-checked=true]{background:var(--menu-accent,#9acde0)!important}
+        #${this.PANEL_ID} :is(.adpb-title,.adpb-subtitle,.adpb-setting-name,.adpb-section-title,.adpb-tab,.adpb-action,.adpb-close){color:var(--menu-text,#ddd)!important}
+        #${this.PANEL_ID} :is(.adpb-setting-description,.adpb-status-detail,.adpb-stat-row,.adpb-foot){color:var(--menu-muted,#bbb)!important}
         #${this.PANEL_ID} .adpb-tabs{display:grid!important;grid-template-columns:repeat(var(--adpb-tab-columns,3),minmax(0,1fr))!important;grid-auto-rows:minmax(30px,auto)!important;gap:3px!important;margin:4px 0!important;flex-shrink:0!important}
         #${this.PANEL_ID} .adpb-tab{min-width:0!important;min-height:30px!important;padding:3px 2px!important;background:#2b2b29!important;border:1px solid #74746f!important;border-radius:6px!important;color:#ddd!important;font:700 11px/1.2 Arial,sans-serif!important;cursor:pointer!important}
         #${this.PANEL_ID} .adpb-tab[aria-selected=true]{background:#35454b!important;border-color:#9acde0!important;color:#fff!important}
@@ -3456,6 +3497,20 @@
           content.appendChild(showMore);
         }
 
+        if (categorySettings.length && category.id !== "advanced") {
+          const resetGroup = document.createElement("button");
+          resetGroup.type = "button";
+          resetGroup.className = "adpb-clear-stats";
+          resetGroup.textContent = `Reset ${category.title}`;
+          resetGroup.addEventListener("click", event => {
+            event.stopPropagation();
+            Core.reset(categorySettings.map(([key]) => key));
+            this.refreshInputs();
+            applySettingsLive();
+          });
+          content.appendChild(resetGroup);
+        }
+
         if (category.id === "advanced") {
           const makeSubmenu = (
             title,
@@ -3770,6 +3825,38 @@
             try { await navigator.clipboard.writeText(text); } catch (error) { window.prompt("Copy diagnostics", text); }
           });
           diagnosticsMenu.body.appendChild(copyDiagnostics);
+          const scanCoverage = document.createElement("button");
+          scanCoverage.type = "button";
+          scanCoverage.className = "adpb-clear-stats";
+          scanCoverage.textContent = "Scan selector coverage";
+          scanCoverage.addEventListener("click", event => {
+            event.stopPropagation();
+            const rows = Core.coverage();
+            diagnosticsOutput.textContent = `${diagnosticsText()}\n\nSelector coverage\n${rows.map(row => `${row.matches ? "matched" : "unmatched"} · ${row.group}.${row.name}`).join("\n")}`;
+          });
+          diagnosticsMenu.body.appendChild(scanCoverage);
+          const exportSettings = document.createElement("button");
+          exportSettings.type = "button";
+          exportSettings.className = "adpb-clear-stats";
+          exportSettings.textContent = "Export settings";
+          exportSettings.addEventListener("click", async event => {
+            event.stopPropagation();
+            const text = Core.exportSettings();
+            try { await navigator.clipboard.writeText(text); } catch { window.prompt("Copy ADPB settings", text); }
+          });
+          diagnosticsMenu.body.appendChild(exportSettings);
+          const importSettings = document.createElement("button");
+          importSettings.type = "button";
+          importSettings.className = "adpb-clear-stats";
+          importSettings.textContent = "Import settings";
+          importSettings.addEventListener("click", event => {
+            event.stopPropagation();
+            const raw = window.prompt("Paste ADPB settings JSON");
+            if (raw === null) return;
+            try { Core.importSettings(raw); this.refreshInputs(); applySettingsLive(); diagnosticsOutput.textContent = diagnosticsText(); }
+            catch { diagnosticsOutput.textContent = `${diagnosticsText()}\n\nImport failed: invalid ADPB settings.`; }
+          });
+          diagnosticsMenu.body.appendChild(importSettings);
           content.appendChild(diagnosticsMenu.root);
         }
 
@@ -4071,6 +4158,11 @@
     updateAppearance() {
       const highContrast =
         UiSettings.highContrast.value || matchMedia('(prefers-contrast: more)').matches;
+      const externalTheme = highContrast ? {} : Core.externalTheme();
+      if (this.host) {
+        this.host.dataset.themeSource = Object.keys(externalTheme).length ? "shared" : "default";
+        for (const [key, value] of Object.entries(externalTheme)) this.host.style.setProperty(key, value);
+      }
 
       if (this.panel) {
         this.panel.classList.toggle(
