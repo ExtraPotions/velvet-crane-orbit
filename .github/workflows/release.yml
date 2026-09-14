@@ -29,7 +29,7 @@ jobs:
 
       # Publish these verified files using the ExtraPotions account after this run passes.
       - name: Package release assets
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: release-assets
           path: |
