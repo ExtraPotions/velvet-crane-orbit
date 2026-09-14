@@ -25,6 +25,8 @@ const assert = require('node:assert/strict');
     const settle = () => page.waitForTimeout(100);
     await settle();
     assert.equal(await panel.getByRole('tab').count(), 6);
+    assert.equal(await panel.locator('.adpb-tabs').evaluate(el => getComputedStyle(el).gridTemplateColumns.split(' ').length), 3, 'category tabs use a three-column grid');
+    assert.equal(await panel.locator('.adpb-tabs').evaluate(el => el.style.getPropertyValue('--adpb-tab-columns')), '3');
     assert.equal(await panel.locator('.adpb-section.is-open .adpb-setting:visible').count(), 6, 'all six settings appear without Show more');
     assert.equal(await panel.getByRole('button', { name: /^Show \d+ more/ }).count(), 0);
     await panel.getByRole('tab', { name: 'Promotions', exact: true }).press('ArrowRight');

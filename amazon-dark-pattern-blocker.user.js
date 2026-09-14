@@ -2819,7 +2819,7 @@
 
     menuVisualCss() {
       return `
-        #${this.PANEL_ID} .adpb-tabs{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:3px!important;margin:4px 0!important;flex-shrink:0!important}
+        #${this.PANEL_ID} .adpb-tabs{display:grid!important;grid-template-columns:repeat(var(--adpb-tab-columns,3),minmax(0,1fr))!important;grid-auto-rows:minmax(30px,auto)!important;gap:3px!important;margin:4px 0!important;flex-shrink:0!important}
         #${this.PANEL_ID} .adpb-tab{min-width:0!important;min-height:30px!important;padding:3px 2px!important;background:#2b2b29!important;border:1px solid #74746f!important;border-radius:6px!important;color:#ddd!important;font:700 11px/1.2 Arial,sans-serif!important;cursor:pointer!important}
         #${this.PANEL_ID} .adpb-tab[aria-selected=true]{background:#35454b!important;border-color:#9acde0!important;color:#fff!important}
         #${this.PANEL_ID}>.adpb-section>.adpb-section-toggle{display:none!important}
@@ -3861,6 +3861,8 @@
       const sections = [...panel.querySelectorAll(":scope > .adpb-section")];
       const tabNames = {promotions:"Promotions",advertising:"Ads",services:"Services",ai:"AI",convenience:"Convenience",advanced:"Advanced"};
       const tabButtons = [];
+      const tabGridColumns = 3;
+      tabs.style.setProperty("--adpb-tab-columns", String(tabGridColumns));
       const syncTabs = () => sections.forEach((section, index) => {
         const selected = section.classList.contains("is-open");
         tabButtons[index].setAttribute("aria-selected", String(selected));
@@ -3885,7 +3887,7 @@
           syncTabs();
         });
         tab.addEventListener("keydown", event => {
-          const step = {ArrowRight:1,ArrowLeft:-1,ArrowDown:3,ArrowUp:-3}[event.key];
+          const step = {ArrowRight:1,ArrowLeft:-1,ArrowDown:tabGridColumns,ArrowUp:-tabGridColumns}[event.key];
           if (step === undefined && event.key !== "Home" && event.key !== "End") return;
           event.preventDefault();
           const next = event.key === "Home" ? 0 : event.key === "End" ? sections.length-1 : (index+step+sections.length)%sections.length;
