@@ -4,11 +4,11 @@
 
 Remove common Amazon dark patterns while keeping control over the protections you want.
 
-[![Amazon ADPB v1.3.3](badge.svg)](https://github.com/ExtraPotions/dark-pattern-blockers/releases/tag/v1.3.5)
+[![Amazon ADPB v1.3.3](badge.svg)](https://github.com/ExtraPotions/dark-pattern-blockers/releases/tag/v1.3.6)
 [![Verify userscript](https://github.com/ExtraPotions/dark-pattern-blockers/actions/workflows/verify.yml/badge.svg)](https://github.com/ExtraPotions/dark-pattern-blockers/actions/workflows/verify.yml)
 [![Latest release](https://img.shields.io/github/v/release/ExtraPotions/dark-pattern-blockers?label=latest%20release)](https://github.com/ExtraPotions/dark-pattern-blockers/releases/latest)
 
-**Version 1.3.5** · By [expDARE](https://github.com/ExtraPotions) · [What's new](CHANGELOG.md)
+**Version 1.3.6** · By [expDARE](https://github.com/ExtraPotions) · [What's new](CHANGELOG.md)
 
 ## Features
 
