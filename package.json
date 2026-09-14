@@ -1,6 +1,10 @@
 {
   "name": "amazon-dark-pattern-blocker",
   "private": true,
+  "engines": {
+    "node": ">=24 <25",
+    "npm": ">=10"
+  },
   "scripts": {
     "test": "node tests/browser.cjs && node tests/upgrade-matrix.cjs && node tests/menu-layout.cjs && node tests/info-buttons.cjs"
   },
