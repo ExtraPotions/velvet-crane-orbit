@@ -4,9 +4,9 @@
 
 Remove common Amazon dark patterns while keeping control over the protections you want.
 
-[![Amazon ADPB v1.3.1](badge.svg)](https://github.com/ExtraPotions/velvet-crane-orbit/releases/tag/v1.3.3)
-[![Verify userscript](https://github.com/ExtraPotions/velvet-crane-orbit/actions/workflows/verify.yml/badge.svg)](https://github.com/ExtraPotions/velvet-crane-orbit/actions/workflows/verify.yml)
-[![Latest release](https://img.shields.io/github/v/release/ExtraPotions/velvet-crane-orbit?label=latest%20release)](https://github.com/ExtraPotions/velvet-crane-orbit/releases/latest)
+[![Amazon ADPB v1.3.3](badge.svg)](https://github.com/ExtraPotions/dark-pattern-blockers/releases/tag/v1.3.3)
+[![Verify userscript](https://github.com/ExtraPotions/dark-pattern-blockers/actions/workflows/verify.yml/badge.svg)](https://github.com/ExtraPotions/dark-pattern-blockers/actions/workflows/verify.yml)
+[![Latest release](https://img.shields.io/github/v/release/ExtraPotions/dark-pattern-blockers?label=latest%20release)](https://github.com/ExtraPotions/dark-pattern-blockers/releases/latest)
 
 **Version 1.3.3** · By [expDARE](https://github.com/ExtraPotions) · [What's new](CHANGELOG.md)
 
@@ -51,7 +51,7 @@ The blocker recognizes other plugins made by expDARE and respects their position
 
 ## Install
 
-Install Violentmonkey or Tampermonkey, then open the [latest userscript](https://github.com/ExtraPotions/velvet-crane-orbit/releases/latest/download/amazon-dark-pattern-blocker.user.js). Update the existing entry to retain settings and reload Amazon.
+Install Violentmonkey or Tampermonkey, then open the [latest userscript](https://github.com/ExtraPotions/dark-pattern-blockers/releases/latest/download/amazon-dark-pattern-blocker.user.js). Update the existing entry to retain settings and reload Amazon.
 
 ## License
 

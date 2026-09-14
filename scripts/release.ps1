@@ -24,7 +24,7 @@ $scriptText = $scriptText -replace '(?m)^// @version\s+\S+', "// @version       
 $scriptText = $scriptText -replace 'const VERSION = "[^"]+"', "const VERSION = `"$Version`""
 $readmeText = $readmeText -replace '(releases/tag/v)\d+\.\d+\.\d+', "`${1}$Version"
 $readmeText = $readmeText -replace '\*\*Version \d+\.\d+\.\d+\*\*', "**Version $Version**"
-$scriptText = $scriptText -replace '(velvet-crane-orbit/v)\d+\.\d+\.\d+(/icon-128.png)', "`${1}$Version`${2}"
+$scriptText = $scriptText -replace '(dark-pattern-blockers/v)\d+\.\d+\.\d+(/icon-128.png)', "`${1}$Version`${2}"
 
 [IO.File]::WriteAllText($scriptPath, $scriptText)
 [IO.File]::WriteAllText($readmePath, $readmeText)

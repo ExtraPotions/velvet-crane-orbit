@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           Amazon Dark Pattern Blocker
-// @namespace      https://github.com/ExtraPotions/velvet-crane-orbit
+// @namespace      https://github.com/ExtraPotions/dark-pattern-blockers
 // @version        1.3.3
 // @description    Hide Amazon ads, upsells, and pressure tactics with adjustable protections and a dimmed reveal mode for hidden items.
 // @tag            amazon
@@ -9,7 +9,7 @@
 // @tag            dark-patterns
 // @author         expDARE
 // @license        CC-BY-NC-4.0
-// @homepageURL    https://github.com/ExtraPotions/velvet-crane-orbit
+// @homepageURL    https://github.com/ExtraPotions/dark-pattern-blockers
 // @match          https://www.amazon.com/*
 // @match          https://amazon.com/*
 // @match          https://www.amazon.co.uk/*
@@ -34,10 +34,10 @@
 // @match          https://amazon.com.mx/*
 // @match          https://www.amazon.nl/*
 // @match          https://amazon.nl/*
-// @icon           https://raw.githubusercontent.com/ExtraPotions/velvet-crane-orbit/v1.3.3/icon-128.png
+// @icon           https://raw.githubusercontent.com/ExtraPotions/dark-pattern-blockers/v1.3.3/icon-128.png
 // @run-at         document-start
-// @downloadURL    https://github.com/ExtraPotions/velvet-crane-orbit/releases/latest/download/amazon-dark-pattern-blocker.user.js
-// @updateURL      https://github.com/ExtraPotions/velvet-crane-orbit/releases/latest/download/amazon-dark-pattern-blocker.user.js
+// @downloadURL    https://github.com/ExtraPotions/dark-pattern-blockers/releases/latest/download/amazon-dark-pattern-blocker.user.js
+// @updateURL      https://github.com/ExtraPotions/dark-pattern-blockers/releases/latest/download/amazon-dark-pattern-blocker.user.js
 // @grant          GM_getValue
 // @grant          GM_setValue
 // @grant          GM_registerMenuCommand
@@ -4276,7 +4276,7 @@
           show(cached.latest);
           return;
         }
-        const response = await fetch("https://api.github.com/repos/ExtraPotions/velvet-crane-orbit/releases/latest", { headers: { Accept: "application/vnd.github+json" } });
+        const response = await fetch("https://api.github.com/repos/ExtraPotions/dark-pattern-blockers/releases/latest", { headers: { Accept: "application/vnd.github+json" } });
         if (!response.ok) return;
         const data = await response.json();
         const latest = String(data.tag_name || "").replace(/^v/, "");

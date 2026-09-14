@@ -3,7 +3,7 @@ const version=fs.readFileSync('amazon-dark-pattern-blocker.user.js','utf8').matc
 (async()=>{const browser=await chromium.launch({headless:true});try{
  for(const csp of [false,true]){
   const context=await browser.newContext({viewport:{width:1000,height:900}});let updateRequests=0;
-  await context.route('https://api.github.com/repos/ExtraPotions/velvet-crane-orbit/releases/latest',r=>{updateRequests+=1;r.fulfill({contentType:'application/json',body:JSON.stringify({tag_name:'v99.0.0'})});});
+  await context.route('https://api.github.com/repos/ExtraPotions/dark-pattern-blockers/releases/latest',r=>{updateRequests+=1;r.fulfill({contentType:'application/json',body:JSON.stringify({tag_name:'v99.0.0'})});});
   await context.route('https://www.amazon.com/**',r=>r.fulfill({contentType:'text/html',headers:csp?{'Content-Security-Policy':"style-src 'self'; img-src 'self' data:"}:{},body:'<style>button{padding:50px!important;color:white!important;background:white!important}</style><div id="primeDPUpsellStaticContainerNPA">Prime upsell</div><p>Regular product information</p>'}));
   await context.addInitScript(()=>{window.GM_getValue=(k,d)=>JSON.parse(localStorage.getItem(k)||JSON.stringify(d));window.GM_setValue=(k,v)=>localStorage.setItem(k,JSON.stringify(v));window.GM_registerMenuCommand=()=>{};});
   await context.addInitScript({content:fs.readFileSync('amazon-dark-pattern-blocker.user.js','utf8')});
