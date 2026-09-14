@@ -2022,6 +2022,7 @@
     infoPopover: null,
     infoPinned: false,
     descriptionId: 0,
+    releaseNotice: null,
 
     css() {
       return `
@@ -2200,6 +2201,23 @@
   scrollbar-width: thin !important;
   text-align: left !important;
 }
+
+#${this.PANEL_ID} .adpb-release-notice {
+  display: grid !important;
+  grid-template-columns: 1fr auto !important;
+  gap: 4px 8px !important;
+  align-items: start !important;
+  margin: 0 8px 4px !important;
+  padding: 7px 8px !important;
+  border: 1px solid rgba(255,153,0,.45) !important;
+  border-radius: 7px !important;
+  background: rgba(255,153,0,.09) !important;
+  color: #f5f5f5 !important;
+  font: 12px/1.3 system-ui,sans-serif !important;
+}
+#${this.PANEL_ID} .adpb-release-notice strong { color: #ffb84d !important; }
+#${this.PANEL_ID} .adpb-release-notice p { grid-column: 1 / -1 !important; margin: 0 !important; }
+#${this.PANEL_ID} .adpb-release-notice button { min-width: 24px !important; min-height: 24px !important; padding: 0 !important; border: 0 !important; background: transparent !important; color: inherit !important; cursor: pointer !important; font-size: 18px !important; line-height: 1 !important; }
 
 #${this.PANEL_ID}.adpb-open {
   display: block !important;
@@ -4198,6 +4216,32 @@
       return false;
     },
 
+    showReleaseNotice() {
+      if (!this.panel || this.releaseNotice) return;
+      let seen = null;
+      try { seen = GM_getValue("adpb-release-notice", ""); } catch (_err) {}
+      if (seen === VERSION) return;
+      const notice = document.createElement("div");
+      notice.className = "adpb-release-notice";
+      notice.setAttribute("role", "status");
+      const heading = document.createElement("strong");
+      heading.textContent = `Updated in ${VERSION}`;
+      const dismiss = document.createElement("button");
+      dismiss.type = "button";
+      dismiss.textContent = "×";
+      dismiss.setAttribute("aria-label", "Dismiss update message");
+      const copy = document.createElement("p");
+      copy.textContent = "Adaptive menus now keep companion plugins together, with tighter layout and clearer first-load guidance.";
+      dismiss.addEventListener("click", () => {
+        try { GM_setValue("adpb-release-notice", VERSION); } catch (_err) {}
+        notice.remove();
+        this.releaseNotice = null;
+      });
+      notice.append(heading, dismiss, copy);
+      this.panel.insertBefore(notice, this.panel.firstChild?.nextSibling || this.panel.firstChild);
+      this.releaseNotice = notice;
+    },
+
     async checkForUpdate() {
       if (!this.host || !this.button) return;
       if (!UiSettings.updateNotifications.value) {
@@ -5302,6 +5346,7 @@
       pushRelatedControls();
 
       this.updateAppearance();
+      this.showReleaseNotice();
       this.checkForUpdate();
 
       this.updateStatus();
