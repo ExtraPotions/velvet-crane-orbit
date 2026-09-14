@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Amazon Dark Pattern Blocker
 // @namespace      https://github.com/ExtraPotions/dark-pattern-blockers
-// @version        1.3.6
+// @version        1.3.7
 // @description    Hide Amazon ads, upsells, and pressure tactics with adjustable protections and a dimmed reveal mode for hidden items.
 // @tag            amazon
 // @tag            shopping
@@ -34,7 +34,7 @@
 // @match          https://amazon.com.mx/*
 // @match          https://www.amazon.nl/*
 // @match          https://amazon.nl/*
-// @icon           https://raw.githubusercontent.com/ExtraPotions/dark-pattern-blockers/v1.3.6/icon-128.png
+// @icon           https://raw.githubusercontent.com/ExtraPotions/dark-pattern-blockers/v1.3.7/icon-128.png
 // @run-at         document-start
 // @downloadURL    https://github.com/ExtraPotions/dark-pattern-blockers/releases/latest/download/amazon-dark-pattern-blocker.user.js
 // @updateURL      https://github.com/ExtraPotions/dark-pattern-blockers/releases/latest/download/amazon-dark-pattern-blocker.user.js
@@ -57,7 +57,7 @@
 (function () {
   "use strict";
 
-  const VERSION = "1.3.6";
+  const VERSION = "1.3.7";
   const CORE_SCHEMA = 2;
   const SITE_KEY = "amazon";
   const CORE_KEY = `adpb:${SITE_KEY}:`;
@@ -2004,7 +2004,50 @@
   function eventShortcut(event){return [...(event.ctrlKey?['Ctrl']:[]),...(event.altKey?['Alt']:[]),...(event.shiftKey?['Shift']:[]),...(event.metaKey?['Meta']:[]),event.key.length===1?event.key.toUpperCase():event.key].join('+');}
   function editableTarget(target){return target?.matches?.('input,textarea,select,[contenteditable="true"]');}
   function shortcutBlocked(node,shortcut){const priority=Number(node?.dataset.launcherPriority||0),id=node?.dataset.launcherId||'';return [...document.querySelectorAll('[data-userscript-launcher="userscript-launcher-v1"]')].some(el=>{if(el===node)return false;let shortcuts=[];try{shortcuts=JSON.parse(el.dataset.launcherShortcuts||'[]');}catch{}const other=Number(el.dataset.launcherPriority||0);return shortcuts.includes(shortcut)&&(other>priority||(other===priority&&(el.dataset.launcherId||'').localeCompare(id)<0));});}
-  function declareLauncher(node,controls,meta){
+
+  // Badge-grid v1: each participant positions its own control using DOM state.
+  // Equal-priority launchers elect the same anchor regardless of script load order.
+  function attachBadgeGrid(node, badge) {
+    node.dataset.badgeGrid='1';
+    badge.dataset.badgeGridControl='1';
+    let pending=0;
+    const layout=()=>{
+      pending=0;
+      const peers=[...document.querySelectorAll('[data-badge-grid="1"]')]
+        .map(host=>({host,control:host.shadowRoot?.querySelector('[data-badge-grid-control="1"]')||host.querySelector('[data-badge-grid-control="1"]')}))
+        .filter(p=>p.control?.isConnected&&p.control.getBoundingClientRect().width>0)
+        .sort((a,b)=>Number(b.host.dataset.launcherPriority||0)-Number(a.host.dataset.launcherPriority||0)||(a.host.dataset.launcherId||a.host.id).localeCompare(b.host.dataset.launcherId||b.host.id));
+      const index=peers.findIndex(p=>p.host===node);
+      if(index<0)return;
+      const leader=peers[0],origin=leader.control.getBoundingClientRect();
+      node.dataset.badgeGridLeader=leader.host.dataset.launcherId;
+      node.dataset.badgeGridIndex=String(index);
+      if(index){
+        const width=Math.max(...peers.map(p=>p.control.getBoundingClientRect().width));
+        const height=Math.max(...peers.map(p=>p.control.getBoundingClientRect().height));
+        const rows=Math.max(1,Math.floor((innerHeight-16)/(height+8)));
+        const row=index%rows,col=Math.floor(index/rows);
+        const bottom=origin.top>innerHeight/2,right=origin.left>innerWidth/2;
+        const rect=badge.getBoundingClientRect();
+        const x=Math.max(8,Math.min(innerWidth-rect.width-8,origin.left+(right?-1:1)*col*(width+8)));
+        const y=Math.max(8,Math.min(innerHeight-rect.height-8,origin.top+(bottom?-1:1)*row*(height+8)));
+        for(const [key,value]of Object.entries({left:x+'px',top:y+'px',right:'auto',bottom:'auto'}))if(badge.style.getPropertyValue(key)!==value)badge.style.setProperty(key,value,'important');
+      }
+      const r=badge.getBoundingClientRect(),value=JSON.stringify({left:r.left,top:r.top,right:r.right,bottom:r.bottom});
+      if(node.dataset.launcherBadgeArea!==value){node.dataset.launcherBadgeArea=value;window.dispatchEvent(new Event('userscript-badge-grid:change'));}
+    };
+    const schedule=()=>{if(!pending)pending=requestAnimationFrame(layout);};
+    window.addEventListener('userscript-badge-grid:change',schedule);
+    window.addEventListener('userscript-launcher:change',schedule);
+    window.addEventListener('resize',schedule);
+    const observer=new MutationObserver(schedule);observer.observe(badge,{attributes:true,attributeFilter:['style','class']});
+    window.addEventListener('pagehide',()=>{observer.disconnect();window.removeEventListener('userscript-badge-grid:change',schedule);window.removeEventListener('userscript-launcher:change',schedule);window.removeEventListener('resize',schedule);},{once:true});
+    schedule();
+    return {refresh:schedule};
+  }
+
+  function declareLauncher(node,controls,meta) {
+    attachBadgeGrid(node,controls()[0]);
     node.dataset.userscriptLauncher=LAUNCHER_PROTOCOL;node.dataset.launcherProtocolVersion=String(LAUNCHER_PROTOCOL_VERSION);node.dataset.launcherOwner=meta.owner;node.dataset.launcherId=meta.id;node.dataset.launcherPriority=String(meta.priority);node.dataset.launcherPreferredPosition=meta.preferredPosition;
     let frame=0;LauncherBridge.register(node,meta);const publish=()=>{frame=0;const rects=controls().filter(el=>el?.isConnected&&el.getClientRects().length).map(el=>el.getBoundingClientRect());if(!rects.length)return;const area={left:Math.round(Math.min(...rects.map(r=>r.left))),top:Math.round(Math.min(...rects.map(r=>r.top))),right:Math.round(Math.max(...rects.map(r=>r.right))),bottom:Math.round(Math.max(...rects.map(r=>r.bottom)))};node.dataset.launcherOccupiedArea=JSON.stringify(area);const detail={protocol:LAUNCHER_PROTOCOL,version:LAUNCHER_PROTOCOL_VERSION,owner:meta.owner,id:meta.id,priority:meta.priority,preferredPosition:meta.preferredPosition,occupiedArea:area};window.dispatchEvent(new CustomEvent('userscript-launcher:change',{detail}));LauncherBridge.announce(detail);};
     const schedule=()=>{if(!frame)frame=requestAnimationFrame(publish);};if(typeof ResizeObserver!=='undefined'){const observer=new ResizeObserver(schedule);for(const el of controls().filter(Boolean))observer.observe(el);}window.addEventListener('resize',schedule,{passive:true});const checkCollision=()=>{let own=[];try{own=JSON.parse(node.dataset.launcherShortcuts||'[]');}catch{}const collision=[...document.querySelectorAll('[data-userscript-launcher="userscript-launcher-v1"]')].some(el=>{if(el===node)return false;try{return JSON.parse(el.dataset.launcherShortcuts||'[]').some(value=>own.includes(value));}catch{return false;}});node.dataset.launcherShortcutCollision=String(collision);};window.addEventListener('userscript-launcher:change',checkCollision);queueMicrotask(checkCollision);return{publish:schedule};
