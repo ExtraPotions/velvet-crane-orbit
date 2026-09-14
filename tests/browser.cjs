@@ -30,10 +30,13 @@ const version=fs.readFileSync('amazon-dark-pattern-blocker.user.js','utf8').matc
   await page.waitForTimeout(50);
   assert.equal(await page.locator('#primeDPUpsellStaticContainerNPA').isVisible(),false);
   const saved=await fab.boundingBox();
-  await page.evaluate(()=>{const secondary=document.createElement('button');secondary.dataset.userscriptLauncher='userscript-launcher-v1';secondary.dataset.launcherOwner='expDARE';secondary.dataset.launcherId='test-companion';secondary.dataset.launcherPriority='50';secondary.dataset.launcherPreferredPosition='right-bottom';secondary.id='test-companion';secondary.style.cssText='position:fixed;right:16px;bottom:16px;width:48px;height:48px;padding:0';document.body.append(secondary);const unrelated=secondary.cloneNode();for(const key of ['userscriptLauncher','launcherOwner','launcherId','launcherPriority','launcherPreferredPosition'])delete unrelated.dataset[key];unrelated.id='test-unrelated';document.body.append(unrelated);});
+  await page.evaluate(()=>{for(const id of ['test-companion','test-companion-two']){const secondary=document.createElement('button');secondary.dataset.userscriptLauncher='userscript-launcher-v1';secondary.dataset.launcherOwner='expDARE';secondary.dataset.launcherId=id;secondary.dataset.launcherPriority='50';secondary.dataset.launcherPreferredPosition='right-bottom';secondary.id=id;secondary.style.cssText='position:fixed;right:16px;bottom:16px;width:48px;height:48px;padding:0';document.body.append(secondary);}const unrelated=document.querySelector('#test-companion').cloneNode();for(const key of ['userscriptLauncher','launcherOwner','launcherId','launcherPriority','launcherPreferredPosition'])delete unrelated.dataset[key];unrelated.id='test-unrelated';document.body.append(unrelated);});
   const unrelatedBefore=await page.locator('#test-unrelated').boundingBox();await page.waitForTimeout(1700);
   assert.equal((await fab.boundingBox()).y,saved.y);
   assert((await page.locator('#test-companion').boundingBox()).x<saved.x-48);
+  assert((await page.locator('#test-companion-two').boundingBox()).x<saved.x-48);
+  const companionOne=await page.locator('#test-companion').boundingBox(), companionTwo=await page.locator('#test-companion-two').boundingBox();
+  assert(companionOne.y+companionOne.height<=companionTwo.y || companionTwo.y+companionTwo.height<=companionOne.y, 'companion grid cells do not overlap');
   assert.equal((await page.locator('#test-unrelated').boundingBox()).x,unrelatedBefore.x);
   await page.emulateMedia({reducedMotion:'reduce',contrast:'more'});await page.waitForTimeout(50);
   assert.equal(await master.evaluate(el=>getComputedStyle(el).backgroundColor),'rgb(255, 255, 255)');

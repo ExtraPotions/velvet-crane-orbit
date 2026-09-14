@@ -1918,38 +1918,32 @@
 
   // DOM-based opt-in works across userscript sandboxes; only expDARE companions yield.
   function coordinateExpdareControls(anchor, registered = []) {
-    const candidates = new Set([...document.querySelectorAll('[data-userscript-launcher="userscript-launcher-v1"],[data-expdare-control="secondary"],#pfh-fab,.pfh-fab'), ...registered]);
-    const anchorNode=anchor.getRootNode().host||anchor;
-    const anchorPriority=Number(anchorNode.dataset.launcherPriority||100);
-    const primary = [anchor];
-    for (const host of document.querySelectorAll('[data-expdare-dock-root]')) {
-      const control = host.shadowRoot?.querySelector('[data-expdare-control="primary"]');
-      if (control && control !== anchor) primary.push(control);
-    }
-    const occupied = primary.map(el=>el.getBoundingClientRect()).filter(r=>r.width&&r.height);
-    const origin=anchor.getBoundingClientRect();
-    const overlaps=r=>occupied.some(o=>r.left<o.right+8&&r.right>o.left-8&&r.top<o.bottom+8&&r.bottom>o.top-8);
-    for (const el of candidates) {
-      if (!el.isConnected || el===anchorNode || primary.includes(el) || el.dataset.expdareControl==='primary' || Number(el.dataset.launcherPriority||0)>=anchorPriority) continue;
-      const ownerRoot=el.getRootNode().host;
-      if(ownerRoot?.dataset.expdareDockRoot==='primary')continue;
-      let rect=el.getBoundingClientRect();
-      if (!rect.width || !rect.height || !['fixed','sticky'].includes(getComputedStyle(el).position)) continue;
-      if(overlaps(rect)){
-        let x=origin.left-rect.width-8,y=origin.top;
-        for(let n=0;n<100;n++){
-          if(x<8){x=Math.max(8,innerWidth-rect.width-16);y-=rect.height+8;}
-          if(y<8)break;
-          const box={left:x,right:x+rect.width,top:y,bottom:y+rect.height};
-          if(!overlaps(box)){
-            for(const [key,value] of Object.entries({left:x+'px',top:y+'px',right:'auto',bottom:'auto'}))el.style.setProperty(key,value,'important');
-            rect=box;break;
-          }
-          x-=rect.width+8;
-        }
-      }
-      occupied.push(rect);
-    }
+    const anchorNode = anchor.getRootNode().host || anchor;
+    const priority = Number(anchorNode.dataset.launcherPriority || 100);
+    const candidates = new Set([...document.querySelectorAll('[data-userscript-launcher="userscript-launcher-v1"],[data-expdare-control="secondary"]'), ...registered]);
+    const companions = [...candidates].filter(el => {
+      if (!el?.isConnected || el === anchorNode || el.dataset.expdareControl === "primary") return false;
+      if (el.dataset.launcherOwner !== "expDARE" && el.dataset.expdareOwner !== "expDARE" && !registered.includes(el)) return false;
+      if (Number(el.dataset.launcherPriority || 0) >= priority) return false;
+      const root = el.getRootNode().host;
+      const rect = el.getBoundingClientRect();
+      return root?.dataset.expdareDockRoot !== "primary" && ["fixed", "sticky"].includes(getComputedStyle(el).position) && rect.width > 0 && rect.height > 0;
+    }).sort((a, b) => String(a.dataset.launcherId || a.id).localeCompare(String(b.dataset.launcherId || b.id)));
+    if (!companions.length) return;
+    const origin = anchor.getBoundingClientRect();
+    const gap = 8;
+    const maxHeight = Math.max(...companions.map(el => el.getBoundingClientRect().height));
+    const maxWidth = Math.max(...companions.map(el => el.getBoundingClientRect().width));
+    const rows = Math.max(1, Math.floor(((innerHeight || 800) - 16 + gap) / (maxHeight + gap)));
+    const originTop = origin.top + rows * (maxHeight + gap) <= (innerHeight || 800) - 8 ? origin.top : Math.max(8, origin.bottom - rows * (maxHeight + gap));
+    companions.forEach((el, index) => {
+      const rect = el.getBoundingClientRect();
+      const row = index % rows;
+      const column = Math.floor(index / rows);
+      const x = Math.max(8, origin.left - gap - rect.width - column * (maxWidth + gap));
+      const y = Math.min(Math.max(8, originTop + row * (maxHeight + gap)), (innerHeight || 800) - rect.height - 8);
+      for (const [key, value] of Object.entries({left: `${x}px`, top: `${y}px`, right: "auto", bottom: "auto"})) el.style.setProperty(key, value, "important");
+    });
   }
   const LAUNCHER_PROTOCOL='userscript-launcher-v1';
   const SHORTCUT_KEY='adpb-open-shortcut';
