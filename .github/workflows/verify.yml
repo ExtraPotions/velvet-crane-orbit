@@ -1,5 +1,5 @@
 name: Verify userscript
-on: [push, pull_request]
+on: [push, pull_request, workflow_dispatch]
 jobs:
   browser:
     runs-on: ubuntu-latest
