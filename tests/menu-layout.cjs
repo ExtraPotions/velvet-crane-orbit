@@ -14,7 +14,6 @@ const assert = require('node:assert/strict');
       window.GM_setValue = () => {};
       window.GM_registerMenuCommand = () => {};
     });
-    await context.addInitScript({ content: fs.readFileSync('DPB-core.user.js', 'utf8') });
     await context.addInitScript({ content: fs.readFileSync('amazon-dark-pattern-blocker.user.js', 'utf8') });
     const page = await context.newPage();
     const errors = [];

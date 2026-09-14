@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.3.3
+
+- Keep the Amazon plugin independently installable while accepting optional shared launcher and theme integrations.
+- Remove obsolete bundled-runtime references from the Amazon package and release assets.
+
 ## 1.2.1
 
 - Clarify the userscript manager description and add Amazon, shopping, ad-blocking and dark-patterns tags.
@@ -38,4 +43,3 @@
 - Preserve original inline display priorities when restoring hidden elements.
 - Add browser coverage for reveal mode, dynamic content, counters, layout and keyboard navigation.
 
-The shared multi-site core remains planned; this release is the standalone Amazon userscript.

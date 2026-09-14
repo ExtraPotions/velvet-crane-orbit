@@ -35,7 +35,6 @@ jobs:
           name: release-assets
           path: |
             amazon-dark-pattern-blocker.user.js
-            DPB-core.user.js
             icon.png
             icon-64.png
             icon-128.png

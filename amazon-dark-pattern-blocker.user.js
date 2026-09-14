@@ -3,7 +3,6 @@
 // @namespace      https://github.com/ExtraPotions/velvet-crane-orbit
 // @version        1.3.2
 // @description    Hide Amazon ads, upsells, and pressure tactics with adjustable protections and a dimmed reveal mode for hidden items.
-// @require        https://github.com/ExtraPotions/velvet-crane-orbit/releases/latest/download/DPB-core.user.js
 // @tag            amazon
 // @tag            shopping
 // @tag            ad-blocking
@@ -5586,11 +5585,12 @@
   // ============================================================
 
   function boot() {
-   if (!window.ExpDareCore || typeof window.ExpDareCore.registerPlugin !== "function") {
-    console.warn("[Amazon Dark Pattern Blocker] DPB-core is required.");
-    return;
+   // The shared runtime is optional. When installed separately, ADPB registers
+   // as a plugin and shares launcher/theme state; without it ADPB remains fully
+   // functional as a standalone userscript.
+   if (window.ExpDareCore && typeof window.ExpDareCore.registerPlugin === "function") {
+    window.ExpDareCore.registerPlugin("amazon-dark-pattern-blocker", {version: VERSION, site: SITE_KEY});
    }
-   window.ExpDareCore.registerPlugin("amazon-dark-pattern-blocker", {version: VERSION, site: SITE_KEY});
    try {
     injectStyles();
   } catch (error) {
