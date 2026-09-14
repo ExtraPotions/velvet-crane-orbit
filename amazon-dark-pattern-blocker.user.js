@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Amazon Dark Pattern Blocker
 // @namespace      https://github.com/ExtraPotions/velvet-crane-orbit
-// @version        1.3.2
+// @version        1.3.3
 // @description    Hide Amazon ads, upsells, and pressure tactics with adjustable protections and a dimmed reveal mode for hidden items.
 // @tag            amazon
 // @tag            shopping
@@ -34,7 +34,7 @@
 // @match          https://amazon.com.mx/*
 // @match          https://www.amazon.nl/*
 // @match          https://amazon.nl/*
-// @icon           https://raw.githubusercontent.com/ExtraPotions/velvet-crane-orbit/v1.3.2/icon-128.png
+// @icon           https://raw.githubusercontent.com/ExtraPotions/velvet-crane-orbit/v1.3.3/icon-128.png
 // @run-at         document-start
 // @downloadURL    https://github.com/ExtraPotions/velvet-crane-orbit/releases/latest/download/amazon-dark-pattern-blocker.user.js
 // @updateURL      https://github.com/ExtraPotions/velvet-crane-orbit/releases/latest/download/amazon-dark-pattern-blocker.user.js
@@ -57,7 +57,7 @@
 (function () {
   "use strict";
 
-  const VERSION = "1.3.2";
+  const VERSION = "1.3.3";
   const CORE_SCHEMA = 2;
   const SITE_KEY = "amazon";
   const CORE_KEY = `adpb:${SITE_KEY}:`;
