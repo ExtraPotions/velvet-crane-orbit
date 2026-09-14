@@ -23,6 +23,8 @@ const assert = require('node:assert/strict');
     const fab = page.locator('#adpb-settings-fab');
     const panel = page.getByRole('dialog');
     await fab.click();
+    const releaseNotice = panel.locator('.adpb-release-notice');
+    if (await releaseNotice.count()) await releaseNotice.getByRole('button', { name: 'Dismiss update message' }).click();
     const settle = () => page.waitForTimeout(100);
     await settle();
     assert.equal(await panel.getByRole('tab').count(), 6);

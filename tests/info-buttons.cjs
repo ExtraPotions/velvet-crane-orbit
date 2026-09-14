@@ -18,6 +18,8 @@ const assert = require('node:assert/strict');
       await page.goto('https://www.amazon.com/dp/fixture');
       await page.locator('#adpb-settings-fab').click();
       const panel = page.getByRole('dialog');
+      const releaseNotice = panel.locator('.adpb-release-notice');
+      if (await releaseNotice.count()) await releaseNotice.getByRole('button', { name: 'Dismiss update message' }).click();
       const info = panel.getByRole('button', { name: 'About Remove Prime upsells', exact: true });
       const control = panel.getByRole('switch', { name: 'Remove Prime upsells', exact: true });
       const tooltip = page.getByRole('tooltip');
