@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name           ExtraPotions Core
+// @name           DPB-core
 // @namespace      https://github.com/ExtraPotions/velvet-crane-orbit
 // @version        1.0.0
 // @description    Shared runtime for ExtraPotions userscript plugins.

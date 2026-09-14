@@ -2,7 +2,7 @@ const {chromium}=require('playwright');
 const fs=require('node:fs');
 const assert=require('node:assert/strict');
 const script=fs.readFileSync('amazon-dark-pattern-blocker.user.js','utf8');
-const core=fs.readFileSync('expdare-core.user.js','utf8');
+const core=fs.readFileSync('DPB-core.user.js','utf8');
 const cases=[
  {from:'0.1.23',values:{'adpb-enabled':false,removePrimeUpsells:false,'adpb-fabTop':180},expect:{'adpb-enabled':false,removePrimeUpsells:false,'adpb-high-contrast':false}},
  {from:'0.1.38',values:{'adpb-enabled':true,removeSponsoredResults:false,'adpb-high-contrast':true,'adpb-fabTop':260},expect:{removeSponsoredResults:false,'adpb-high-contrast':true}},
