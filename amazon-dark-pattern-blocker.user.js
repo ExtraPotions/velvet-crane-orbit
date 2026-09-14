@@ -1956,10 +1956,19 @@
   function coordinateExpdareControls(anchor, registered = []) {
     const anchorNode = anchor.getRootNode().host || anchor;
     const priority = Number(anchorNode.dataset.launcherPriority || 100);
-    const candidates = new Set([...document.querySelectorAll('[data-userscript-launcher="userscript-launcher-v1"],[data-expdare-control="secondary"]'), ...registered]);
+    const discovered = [];
+    const scan = (root) => {
+      root.querySelectorAll?.('[data-userscript-launcher="userscript-launcher-v1"],[data-expdare-control],[data-expdare-owner="expDARE"]').forEach(node => discovered.push(node));
+      root.querySelectorAll?.('*').forEach(node => { if (node.shadowRoot) scan(node.shadowRoot); });
+    };
+    scan(document);
+    const candidates = new Set([...discovered, ...registered]);
     const companions = [...candidates].filter(el => {
       if (!el?.isConnected || el === anchorNode || el.dataset.expdareControl === "primary") return false;
-      if (el.dataset.launcherOwner !== "expDARE" && el.dataset.expdareOwner !== "expDARE" && !registered.includes(el)) return false;
+      // Any participant advertising the launcher protocol can join the grid;
+      // ownership is deliberately not restricted so independent companion
+      // scripts can align beside the primary badge too.
+      if (!registered.includes(el) && el.dataset.userscriptLauncher !== LAUNCHER_PROTOCOL && el.dataset.expdareControl !== "secondary" && el.dataset.expdareOwner !== "expDARE") return false;
       if (Number(el.dataset.launcherPriority || 0) >= priority) return false;
       const root = el.getRootNode().host;
       const rect = el.getBoundingClientRect();
@@ -1967,6 +1976,8 @@
     }).sort((a, b) => String(a.dataset.launcherId || a.id).localeCompare(String(b.dataset.launcherId || b.id)));
     if (!companions.length) return;
     const origin = anchor.getBoundingClientRect();
+    const viewportWidth = innerWidth || 1024;
+    const alignRight = origin.left < viewportWidth / 2;
     const gap = 8;
     const maxHeight = Math.max(...companions.map(el => el.getBoundingClientRect().height));
     const maxWidth = Math.max(...companions.map(el => el.getBoundingClientRect().width));
@@ -1976,7 +1987,9 @@
       const rect = el.getBoundingClientRect();
       const row = index % rows;
       const column = Math.floor(index / rows);
-      const x = Math.max(8, origin.left - gap - rect.width - column * (maxWidth + gap));
+      const x = alignRight
+        ? Math.min(viewportWidth - rect.width - 8, origin.right + gap + column * (maxWidth + gap))
+        : Math.max(8, origin.left - gap - rect.width - column * (maxWidth + gap));
       const y = Math.min(Math.max(8, originTop + row * (maxHeight + gap)), (innerHeight || 800) - rect.height - 8);
       for (const [key, value] of Object.entries({left: `${x}px`, top: `${y}px`, right: "auto", bottom: "auto"})) el.style.setProperty(key, value, "important");
     });
