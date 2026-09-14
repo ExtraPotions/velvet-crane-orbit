@@ -3,6 +3,7 @@
 // @namespace      https://github.com/ExtraPotions/velvet-crane-orbit
 // @version        1.2.1
 // @description    Hide Amazon ads, upsells, and pressure tactics with adjustable protections and a dimmed reveal mode for hidden items.
+// @require        https://github.com/ExtraPotions/velvet-crane-orbit/releases/latest/download/expdare-core.user.js
 // @tag            amazon
 // @tag            shopping
 // @tag            ad-blocking
@@ -5527,6 +5528,11 @@
   // ============================================================
 
   function boot() {
+   if (!window.ExpDareCore || typeof window.ExpDareCore.registerPlugin !== "function") {
+    console.warn("[Amazon Dark Pattern Blocker] ExtraPotions Core is required.");
+    return;
+   }
+   window.ExpDareCore.registerPlugin("amazon-dark-pattern-blocker", {version: VERSION, site: SITE_KEY});
    try {
     injectStyles();
   } catch (error) {
